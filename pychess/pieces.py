@@ -4,44 +4,56 @@ Created on Jun 21, 2013
 @author: nick
 '''
 
-from util import enum
+from utils import enum
 
 colors = enum(WHITE=0, BLACK=1)
 pieces = enum(PAWN=0, KNIGHT=1, BISHOP=2, ROOK=3, QUEEN=4, KING=5)
 
-def to_utf2(piece, color):
-    return '%s_%s' % (color, piece)
+class ChessPiece(object):
+    
+    def __init__(self, long_name, color, piece_type, value, utf_code_white, algebraic, has_moved):
+        self.long_name = long_name
+        self.color = color
+        self.piece_type = piece_type
+        self.value = value
+        self.utf_code_white = utf_code_white
+        self.algebraic = algebraic
+        self.has_moved = has_moved
 
-def to_utf(piece, color):
-    if color == colors.WHITE:
-        if piece == pieces.KING:
-            return unichr(9812)
-        elif piece == pieces.QUEEN:
-            return unichr(9813)
-        elif piece == pieces.ROOK:
-            return unichr(9814)
-        elif piece == pieces.BISHOP:
-            return unichr(9815)
-        elif piece == pieces.KNIGHT:
-            return unichr(9816)
-        elif piece == pieces.PAWN:
-            return unichr(9817)
-        else:
-            return ValueError('Piece code %s does not match any known pieces.' % piece)
-    elif color == colors.BLACK:
-        if piece == pieces.KING:
-            return unichr(9818)
-        elif piece == pieces.QUEEN:
-            return unichr(9819)
-        elif piece == pieces.ROOK:
-            return unichr(9820)
-        elif piece == pieces.BISHOP:
-            return unichr(9821)
-        elif piece == pieces.KNIGHT:
-            return unichr(9822)
-        elif piece == pieces.PAWN:
-            return unichr(9823)
-        else:
-            return ValueError('Piece code %s does not match any known pieces.' % piece)
-    else:
-        raise ValueError('Color code %s does not match that of White or Black.' % color)
+    def __unicode__(self):
+        if self.color == colors.WHITE:
+            return unichr(self.utf_code)
+        elif self.color == colors.BLACK:
+            return unichr(self.utf_code + 6)
+    
+    def __str__(self):
+        return self.algebraic
+    
+    def __repr__(self):
+        return '%s(long_name=%s, color=%s, piece_type=%s, value=%s, utf_code_white=%s, algebraic=%s, has_moved=%s)' \
+            % (self.__name__.__class__, self.long_name, self.color, self.piece_type, \
+               self.value, self.utf_code_white, self.algebraic, self.has_moved)
+            
+class Pawn(ChessPiece): #Icky, pawns aren't pieces, per-say!
+    def __init__(self, color, has_moved=False):
+        super(Pawn, self).__init__('Pawn', color, pieces.PAWN, 1, 9817, '', has_moved)
+
+class Knight(ChessPiece):
+    def __init__(self, color, has_moved=False):
+        super(Knight, self).__init__('Knight', color, pieces.KNIGHT, 3, 9816, 'N', has_moved)
+
+class Bishop(ChessPiece):
+    def __init__(self, color, has_moved=False):
+        super(Bishop, self).__init__('Bishop', color, pieces.BISHOP, 3, 9815, 'B', has_moved)
+        
+class Rook(ChessPiece):
+    def __init__(self, color, has_moved=False):
+        super(Rook, self).__init__('Rook', color, pieces.ROOK, 5, 9814, 'R', has_moved)
+
+class Queen(ChessPiece):
+    def __init__(self, color, has_moved=False):
+        super(Queen, self).__init__('Queen', color, pieces.QUEEN, 9, 9813, 'Q', has_moved)
+
+class King(ChessPiece):
+    def __init__(self, color, has_moved=False):
+        super(King, self).__init__('King', color, pieces.KING, 999, 9812, 'K', has_moved)

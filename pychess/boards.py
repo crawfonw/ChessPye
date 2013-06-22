@@ -6,6 +6,7 @@ Created on Jun 20, 2013
 
 from pieces import colors, pieces
 from pieces import to_utf
+from utils import ctl
 
 class Board(object):
     
@@ -37,7 +38,7 @@ class Board(object):
             s += '\n'
         s += '  '
         for i in range(self.height):
-            s += '| %s ' % chr(97 + i)
+            s += '| %s ' % ctl(i)
         s += '\n'
         return s.encode('UTF-8')
     
