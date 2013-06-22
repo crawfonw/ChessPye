@@ -5,8 +5,6 @@ Created on Jun 20, 2013
 '''
 
 from boards import ClassicBoard
-from pieces import colors, pieces
-from pieces import to_algebraic
 from utils import ctl
 
 class VanillaChess(object):
@@ -30,8 +28,11 @@ class VanillaChess(object):
         return 'VanillaChess(white_player=%r, black_player=%r)' % (self.white_player, self.black_player) 
         
     def coordinate_to_algebraic(self, to_sq, from_sq):
-        #piece_code = 
-        pass
+        alg = str(from_sq[1])
+        if to_sq[1] is not None:
+            alg += 'x'
+        alg += '%s%s' % (ctl(to_sq[0][1]), to_sq[0][0] + 1)
+        return alg
     
     def algebraic_to_coordinate(self, algebraic):
         pass

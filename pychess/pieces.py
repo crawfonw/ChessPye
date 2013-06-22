@@ -33,7 +33,7 @@ class ChessPiece(object):
         return '%s(long_name=%s, color=%s, piece_type=%s, value=%s, utf_code_white=%s, algebraic=%s, has_moved=%s)' \
             % (self.__class__.__name__, self.long_name, self.color, self.piece_type, \
                self.value, self.utf_code_white, self.algebraic, self.has_moved)
-            
+
 class Pawn(ChessPiece): #Icky, pawns aren't pieces, per-say!
     def __init__(self, color, has_moved=False):
         super(Pawn, self).__init__('Pawn', color, pieces.PAWN, 1, 9817, '', has_moved)

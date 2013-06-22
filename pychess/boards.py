@@ -17,10 +17,10 @@ class Board(object):
     
     def __str__(self):
         s = u'\n'
-        for i in range(self.height): #row
-            s += '%s ' % (self.height - i)
-            for j in range(self.width): #col
-                if self.pieces.has_key((i,j)):
+        for i in range(self.height - 1, -1, -1): #row
+            s += '%s ' % (i + 1)
+            for j in range(self.width - 1, -1 ,-1): #col
+                if self.pieces[(i,j)] is not None:
                     s += '| %s ' % self.pieces[(i,j)].__unicode__()
                 else:
                     s += '|   '
@@ -36,24 +36,29 @@ class Board(object):
     def __repr__(self):
         s = 'Board(width=%s,height=%s) Contents:\n' % (self.width, self.height)
         for piece in self.pieces.viewitems():
-            s += '%s at %s\n' % (piece[1].__repr__(), piece[0])
+            if piece[1] is not None:
+                s += '%s at %s\n' % (piece[1].__repr__(), piece[0])
         return s
 
 class ClassicBoard(Board):
     
     def __init__(self):
         super(ClassicBoard, self).__init__(8,8)
-        self.pieces = {(0,0):Rook(colors.BLACK), (0,1):Knight(colors.BLACK), (0,2):Bishop(colors.BLACK),
-                             (0,3):Queen(colors.BLACK), (0,4):King(colors.BLACK), (0,5):Bishop(colors.BLACK),
-                             (0,6):Knight(colors.BLACK), (0,7):Rook(colors.BLACK), (1,0):Pawn(colors.BLACK), 
-                             (1,1):Pawn(colors.BLACK), (1,2):Pawn(colors.BLACK), (1,3):Pawn(colors.BLACK), 
-                             (1,4):Pawn(colors.BLACK), (1,5):Pawn(colors.BLACK), (1,6):Pawn(colors.BLACK),
-                             (1,7):Pawn(colors.BLACK), \
+        self.pieces = {(0,0):Rook(colors.WHITE), (0,1):Knight(colors.WHITE), (0,2):Bishop(colors.WHITE),
+                             (0,3):Queen(colors.WHITE), (0,4):King(colors.WHITE), (0,5):Bishop(colors.WHITE),
+                             (0,6):Knight(colors.WHITE), (0,7):Rook(colors.WHITE), (1,0):Pawn(colors.WHITE), 
+                             (1,1):Pawn(colors.WHITE), (1,2):Pawn(colors.WHITE), (1,3):Pawn(colors.WHITE), 
+                             (1,4):Pawn(colors.WHITE), (1,5):Pawn(colors.WHITE), (1,6):Pawn(colors.WHITE),
+                             (1,7):Pawn(colors.WHITE), \
                              
-                             (7,0):Rook(colors.WHITE), (7,1):Knight(colors.WHITE), (7,2):Bishop(colors.WHITE),
-                             (7,3):Queen(colors.WHITE), (7,4):King(colors.WHITE), (7,5):Bishop(colors.WHITE),
-                             (7,6):Knight(colors.WHITE), (7,7):Rook(colors.WHITE), (6,0):Pawn(colors.WHITE), 
-                             (6,1):Pawn(colors.WHITE), (6,2):Pawn(colors.WHITE), (6,3):Pawn(colors.WHITE), 
-                             (6,4):Pawn(colors.WHITE), (6,5):Pawn(colors.WHITE), (6,6):Pawn(colors.WHITE),
-                             (6,7):Pawn(colors.WHITE)}
+                             (7,0):Rook(colors.BLACK), (7,1):Knight(colors.BLACK), (7,2):Bishop(colors.BLACK),
+                             (7,3):Queen(colors.BLACK), (7,4):King(colors.BLACK), (7,5):Bishop(colors.BLACK),
+                             (7,6):Knight(colors.BLACK), (7,7):Rook(colors.BLACK), (6,0):Pawn(colors.BLACK), 
+                             (6,1):Pawn(colors.BLACK), (6,2):Pawn(colors.BLACK), (6,3):Pawn(colors.BLACK), 
+                             (6,4):Pawn(colors.BLACK), (6,5):Pawn(colors.BLACK), (6,6):Pawn(colors.BLACK),
+                             (6,7):Pawn(colors.BLACK)}
+        for i in range(self.height):
+            for j in range(self.width):
+                if not self.pieces.has_key((i,j)):
+                    self.pieces[(i,j)] = None
         
