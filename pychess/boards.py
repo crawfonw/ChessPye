@@ -16,10 +16,6 @@ class Board(object):
         self.black_pieces = {}
     
     def __str__(self):
-        print self.encode()
-        return '' #This is hacky; I hate messing with Unicode...
-    
-    def encode(self):
         s = u'\n'
         for i in range(self.height): #row
             s += '%s ' % (self.height - i)
@@ -43,6 +39,15 @@ class Board(object):
         for i in range(self.height):
             s += '| %s ' % chr(97 + i)
         s += '\n'
+        return s.encode('UTF-8')
+    
+    def __repr__(self):
+        s = 'Board(width=%s,height=%s) Contents:\nWhite:\n' % (self.width, self.height)
+        for piece in self.white_pieces.viewitems():
+            s += '%s at %s\n' % (piece[1], piece[0])
+        s += 'Black\n'
+        for piece in self.black_pieces.viewitems():
+            s += '%s at %s\n' % (piece[1], piece[0])
         return s
 
 class ClassicBoard(Board):

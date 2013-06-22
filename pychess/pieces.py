@@ -3,7 +3,7 @@ Created on Jun 21, 2013
 
 @author: nick
 '''
-#pieces = ''.join(unichr(9812 + x) for x in range(12))
+
 def enum(**enums):
     return type('Enum', (), enums)
 

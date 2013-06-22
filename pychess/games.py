@@ -5,6 +5,7 @@ Created on Jun 20, 2013
 '''
 
 from boards import ClassicBoard
+from pieces import COLORS, PIECES
 
 class VanillaChess(object):
     '''
@@ -23,6 +24,9 @@ class VanillaChess(object):
         self.white_in_checkmate = False
         self.black_in_checkmate = False
         
+    def __repr__(self):
+        return 'VanillaChess(white_player=%r, black_player=%r)' % (self.white_player, self.black_player) 
+        
     def coordinate_to_algebraic(self, to_sq, from_sq):
         pass
     
@@ -39,6 +43,9 @@ class VanillaChess(object):
         pass
     
     def piece_can_move_from_to(self, piece, to_sq, from_sq):
+        pass
+    
+    def score_board(self):
         pass
     
     
