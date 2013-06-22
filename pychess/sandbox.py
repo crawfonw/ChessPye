@@ -10,3 +10,4 @@ c = ClassicBoard()
 
 if __name__ == '__main__':
     print c
+    #print c.__repr__()

@@ -22,16 +22,16 @@ class ChessPiece(object):
 
     def __unicode__(self):
         if self.color == colors.WHITE:
-            return unichr(self.utf_code)
+            return unichr(self.utf_code_white)
         elif self.color == colors.BLACK:
-            return unichr(self.utf_code + 6)
+            return unichr(self.utf_code_white + 6)
     
     def __str__(self):
         return self.algebraic
     
     def __repr__(self):
         return '%s(long_name=%s, color=%s, piece_type=%s, value=%s, utf_code_white=%s, algebraic=%s, has_moved=%s)' \
-            % (self.__name__.__class__, self.long_name, self.color, self.piece_type, \
+            % (self.__class__.__name__, self.long_name, self.color, self.piece_type, \
                self.value, self.utf_code_white, self.algebraic, self.has_moved)
             
 class Pawn(ChessPiece): #Icky, pawns aren't pieces, per-say!
