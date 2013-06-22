@@ -5,7 +5,7 @@ Created on Jun 20, 2013
 '''
 
 from boards import ClassicBoard
-from pieces import COLORS, PIECES
+from pieces import colors, pieces
 
 class VanillaChess(object):
     '''
