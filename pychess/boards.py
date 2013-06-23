@@ -42,6 +42,13 @@ class Board(object):
             if piece[1] is not None:
                 s += '%s at %s\n' % (piece[1].__repr__(), piece[0])
         return s
+    
+    def coordinate_to_algebraic(self, to_sq, from_sq):
+        alg = str(from_sq[1])
+        if to_sq[1] is not None:
+            alg += 'x'
+        alg += '%s%s' % (ctl(to_sq[0][1]), to_sq[0][0] + 1)
+        return alg
 
 class ClassicBoard(Board):
     
@@ -55,15 +62,6 @@ class ClassicBoard(Board):
         self.pieces[(0,5)] = Bishop(colors.WHITE)
         self.pieces[(0,6)] = Knight(colors.WHITE)
         self.pieces[(0,7)] = Rook(colors.WHITE)
-        self.pieces[(1,0)] = Pawn(colors.WHITE)
-        self.pieces[(1,1)] = Pawn(colors.WHITE)
-        self.pieces[(1,2)] = Pawn(colors.WHITE)
-        self.pieces[(1,3)] = Pawn(colors.WHITE)
-        self.pieces[(1,4)] = Pawn(colors.WHITE)
-        self.pieces[(1,5)] = Pawn(colors.WHITE)
-        self.pieces[(1,6)] = Pawn(colors.WHITE)
-        self.pieces[(1,7)] = Pawn(colors.WHITE)
-        
         self.pieces[(7,0)] = Rook(colors.BLACK)
         self.pieces[(7,1)] = Knight(colors.BLACK)
         self.pieces[(7,2)] = Bishop(colors.BLACK)
@@ -72,12 +70,7 @@ class ClassicBoard(Board):
         self.pieces[(7,5)] = Bishop(colors.BLACK)
         self.pieces[(7,6)] = Knight(colors.BLACK)
         self.pieces[(7,7)] = Rook(colors.BLACK)
-        self.pieces[(6,0)] = Pawn(colors.BLACK)
-        self.pieces[(6,1)] = Pawn(colors.BLACK)
-        self.pieces[(6,2)] = Pawn(colors.BLACK)
-        self.pieces[(6,3)] = Pawn(colors.BLACK)
-        self.pieces[(6,4)] = Pawn(colors.BLACK)
-        self.pieces[(6,5)] = Pawn(colors.BLACK)
-        self.pieces[(6,6)] = Pawn(colors.BLACK)
-        self.pieces[(6,7)] = Pawn(colors.BLACK)
+        for i in range(self.width):
+            self.pieces[(1,i)] = Pawn(colors.WHITE)
+            self.pieces[(6,i)] = Pawn(colors.BLACK)
         
