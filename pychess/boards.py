@@ -14,9 +14,7 @@ class Board(object):
         self.width = width
         self.height = height
         self.pieces = {}
-        for i in range(self.height):
-            for j in range(self.width):
-                self.pieces[(i,j)] = None
+        self.clear_board()
     
     def __str__(self):
         s = u'\n'
@@ -49,6 +47,14 @@ class Board(object):
             alg += 'x'
         alg += '%s%s' % (ctl(to_sq[0][1]), to_sq[0][0] + 1)
         return alg
+    
+    def get_coordinate_piece_tuple(self, r, c):
+        return ((r,c), self.pieces[(r,c)])
+    
+    def clear_board(self):
+        for i in range(self.height):
+            for j in range(self.width):
+                self.pieces[(i,j)] = None
 
 class ClassicBoard(Board):
     
