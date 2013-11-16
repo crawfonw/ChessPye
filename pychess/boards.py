@@ -4,8 +4,7 @@ Created on Jun 20, 2013
 @author: nick
 '''
 
-from pieces import colors
-from pieces import Pawn, Knight, Bishop, Rook, Queen, King
+from pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors
 from utils import ctl
 
 class Board(object):
@@ -38,7 +37,7 @@ class Board(object):
         s = 'Board(width=%s,height=%s) Contents:\n' % (self.width, self.height)
         for piece in self.pieces.viewitems():
             if piece[1] is not None:
-                s += '%s at %s\n' % (piece[1].__repr__(), piece[0])
+                s += '%s at %s\n' % (repr(piece[1]), piece[0])
         return s
     
     def coordinate_to_algebraic(self, to_sq, from_sq):

@@ -4,7 +4,7 @@ Created on Jun 20, 2013
 @author: nick
 '''
 
-from boards import ClassicBoard
+from boards import ClassicBoard, colors
 
 class VanillaChess(object):
     '''
@@ -30,7 +30,7 @@ class VanillaChess(object):
         pass
     
     def is_king_in_checkmate(self, color):
-        pass
+        return False
     
     def is_valid_board_position(self):
         pass
@@ -39,6 +39,13 @@ class VanillaChess(object):
         pass
     
     def score_board(self):
-        pass
-    
-    
+        if self.is_king_in_checkmate(colors.WHITE):
+            return float('inf')
+        elif self.is_king_in_checkmate(colors.BLACK):
+            return float('-inf')
+        else:
+            score = 0
+            for piece in self.board.pieces.itervalues():
+                if piece is not None:
+                    score += piece.color * piece.value
+        return score 
