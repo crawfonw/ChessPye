@@ -66,21 +66,21 @@ class VanillaChess(object):
         
         if piece.move_type == move_types.EXACT:
             for move in pattern_types:
-                if tuple(sum(x) for x in zip(move, from_sq)) == to_sq:
+                if Vec2d(move) + Vec2d(from_sq) == Vec2d(to_sq):
                     if piece.can_jump:
                         return True
                     else:
                         #This piece can move here assuming it is unblocked
                         #Now find the straight-line path and make sure nothing is blocking
                         f = lambda x : int(copysign(1,x)) if x != 0 else 0
-                        unit_move = (f(move[0]), f(move[1]))
-                        curr_sq = from_sq
-                        while curr_sq != to_sq:
-                            curr_sq = tuple(sum(x) for x in zip(unit_move, curr_sq))
-                            if not self.board.square_is_on_board(curr_sq):
+                        unit_move = Vec2d(f(move[0]), f(move[1]))
+                        curr_sq = Vec2d(from_sq) + unit_move
+                        while tuple(curr_sq) != to_sq:
+                            if not self.board.square_is_on_board(tuple(curr_sq)):
                                 return False
-                            if self.board.pieces[curr_sq] is not None and curr_sq != to_sq: #Second expr for edge case on loop
+                            if self.board.pieces[tuple(curr_sq)] is not None:
                                 return False
+                            curr_sq += unit_move
                         return True
         elif piece.move_type == move_types.MAX:
             for move in pattern_types:
@@ -90,14 +90,13 @@ class VanillaChess(object):
                 #have an angle of zero between them and point the same direction
                 #(i.e. scalar multiples of one another)
                 if dir_vec.get_angle_between(move_vec) == 0:
-                    curr_sq = from_sq
-                    while curr_sq != to_sq:
-                        curr_sq = tuple(sum(x) for x in zip(move, curr_sq))
-                        if not self.board.square_is_on_board(curr_sq):
+                    curr_sq = Vec2d(from_sq) + dir_vec
+                    while tuple(curr_sq) != to_sq:
+                        if not self.board.square_is_on_board(tuple(curr_sq)):
                             return False
-                        if self.board.pieces[curr_sq] is not None and \
-                            not piece.can_jump and curr_sq != to_sq: #Second expr for edge case on loop
+                        if self.board.pieces[tuple(curr_sq)] is not None and not piece.can_jump:
                             return False
+                        curr_sq += dir_vec
                     return True
 
     def score_board(self):
