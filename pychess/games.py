@@ -6,6 +6,7 @@ Created on Jun 20, 2013
 
 from boards import ClassicBoard
 from pieces import colors, move_types
+from utils import Vec2d
 
 from math import copysign
 
@@ -62,25 +63,40 @@ class VanillaChess(object):
                 pattern_types = piece.attack_patterns()
         else:
             pattern_types = piece.move_patterns()
-            
-        for move in pattern_types:
-            if tuple(sum(x) for x in zip(move, from_sq)) == to_sq:
-                if piece.can_jump:
-                    return True
-                else:
-                    #This piece can move here assuming it is unblocked
-                    #Now find the straight-line path and make sure nothing is blocking
-                    if piece.move_type == move_types.EXACT:
-                        f = lambda x : int(copysign(1,x)) if x != 0 else 0
-                        normalized_move = (f(move[0]), f(move[1]))
+        
+        if piece.move_type == move_types.EXACT:
+            for move in pattern_types:
+                if tuple(sum(x) for x in zip(move, from_sq)) == to_sq:
+                    if piece.can_jump:
+                        return True
                     else:
-                        normalized_move = move
+                        #This piece can move here assuming it is unblocked
+                        #Now find the straight-line path and make sure nothing is blocking
+                        f = lambda x : int(copysign(1,x)) if x != 0 else 0
+                        unit_move = (f(move[0]), f(move[1]))
+                        curr_sq = from_sq
+                        while curr_sq != to_sq:
+                            curr_sq = tuple(sum(x) for x in zip(unit_move, curr_sq))
+                            if not self.board.square_is_on_board(curr_sq):
+                                return False
+                            if self.board.pieces[curr_sq] is not None and curr_sq != to_sq: #Second expr for edge case on loop
+                                return False
+                        return True
+        elif piece.move_type == move_types.MAX:
+            for move in pattern_types:
+                dir_vec = Vec2d(move) #a unit vector
+                move_vec = Vec2d(to_sq[0] - from_sq[0], to_sq[1] - from_sq[1])
+                #This direction is a valid movement if vectorized coordinates 
+                #have an angle of zero between them and point the same direction
+                #(i.e. scalar multiples of one another)
+                if dir_vec.get_angle_between(move_vec) == 0:
                     curr_sq = from_sq
                     while curr_sq != to_sq:
-                        curr_sq = tuple(sum(x) for x in zip(normalized_move, curr_sq))
+                        curr_sq = tuple(sum(x) for x in zip(move, curr_sq))
                         if not self.board.square_is_on_board(curr_sq):
                             return False
-                        if self.board.pieces[curr_sq] is not None and curr_sq != to_sq: #Second expr for edge case on loop
+                        if self.board.pieces[curr_sq] is not None and \
+                            not piece.can_jump and curr_sq != to_sq: #Second expr for edge case on loop
                             return False
                     return True
 

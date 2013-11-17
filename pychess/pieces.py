@@ -53,7 +53,7 @@ class Pawn(ChessPiece): #Icky, pawns aren't pieces, per-say!
         
     def move_patterns(self):
         if not self.has_moved:
-            return [(1,0), (2,0)]
+            return [(2,0), (1,0)]
         else:
             return [(1,0)]
         
