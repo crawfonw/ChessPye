@@ -54,6 +54,9 @@ class Board(object):
         for i in range(self.height):
             for j in range(self.width):
                 self.pieces[(i,j)] = None
+                
+    def square_is_on_board(self, square):
+        return square[0] > self.width or square[0] < 0 or square[1] > self.height or square[1] < 0
 
 class ClassicBoard(Board):
     
