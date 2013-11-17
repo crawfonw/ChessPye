@@ -44,7 +44,8 @@ class ChessPiece(object):
         '''
         return
     
-    attack_patterns = move_patterns
+    def attack_patterns(self):
+        return
 
 class Pawn(ChessPiece): #Icky, pawns aren't pieces, per-say!
     def __init__(self, color, has_moved=False):
@@ -52,44 +53,54 @@ class Pawn(ChessPiece): #Icky, pawns aren't pieces, per-say!
         
     def move_patterns(self):
         if not self.has_moved:
-            return ((0,1), (0,2))
+            return [(1,0), (2,0)]
         else:
-            return ((0,1))
+            return [(1,0)]
         
     def attack_patterns(self):
-        return ((1,1), (1,-1))
+        return [(1,1), (1,-1)]
 
 class Knight(ChessPiece):
     def __init__(self, color, has_moved=False):
         super(Knight, self).__init__('Knight', color, pieces.KNIGHT, 3, 9816, 'N', has_moved, move_types.EXACT, True)
         
     def move_patterns(self):
-        return ((2,1), (2,-1), (-2,1), (-2,-1), (1,2), (-1,2), (1,-2), (-1,-2))
+        return [(2,1), (2,-1), (-2,1), (-2,-1), (1,2), (-1,2), (1,-2), (-1,-2)]
+    
+    attack_patterns = move_patterns
 
 class Bishop(ChessPiece):
     def __init__(self, color, has_moved=False):
         super(Bishop, self).__init__('Bishop', color, pieces.BISHOP, 3, 9815, 'B', has_moved, move_types.MAX)
         
     def move_patterns(self):
-        return ((1,1), (1,-1), (-1,1), (-1,-1))
+        return [(1,1), (1,-1), (-1,1), (-1,-1)]
+    
+    attack_patterns = move_patterns
         
 class Rook(ChessPiece):
     def __init__(self, color, has_moved=False):
         super(Rook, self).__init__('Rook', color, pieces.ROOK, 5, 9814, 'R', has_moved, move_types.MAX)
         
     def move_patterns(self):
-        return ((1,0), (-1,0), (0,1), (0,-1))
+        return [(1,0), (-1,0), (0,1), (0,-1)]
+    
+    attack_patterns = move_patterns
 
 class Queen(ChessPiece):
     def __init__(self, color, has_moved=False):
         super(Queen, self).__init__('Queen', color, pieces.QUEEN, 9, 9813, 'Q', has_moved, move_types.MAX)
         
     def move_patterns(self):
-        return ((1,0), (-1,0), (0,1), (0,-1), (1,1), (1,-1), (-1,1), (-1,-1))
+        return [(1,0), (-1,0), (0,1), (0,-1), (1,1), (1,-1), (-1,1), (-1,-1)]
+    
+    attack_patterns = move_patterns
 
 class King(ChessPiece):
     def __init__(self, color, has_moved=False):
         super(King, self).__init__('King', color, pieces.KING, 999, 9812, 'K', has_moved, move_types.EXACT)
         
     def move_patterns(self):
-        return ((1,0), (-1,0), (0,1), (0,-1), (1,1), (1,-1), (-1,1), (-1,-1))
+        return [(1,0), (-1,0), (0,1), (0,-1), (1,1), (1,-1), (-1,1), (-1,-1)]
+    
+    attack_patterns = move_patterns

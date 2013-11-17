@@ -131,7 +131,6 @@ class TestCoordinateToAlgebraicConversions(unittest.TestCase):
         converted_move = self.board.coordinate_to_algebraic(pawn, rook)
         self.assertEqual(correct_move, converted_move, 'Move notation %s should be %s' % (converted_move, correct_move))
         
-    
     def testConvertCoordinateToAlgebraicWithCapturePawn(self):
         self.fail('Not implemented')
     
