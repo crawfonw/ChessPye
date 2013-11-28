@@ -56,7 +56,7 @@ class VanillaChess(object):
     def piece_can_move_from_to(self, piece, from_sq, to_sq):
         pattern_types = None
         to_sq_piece = self.board.pieces[to_sq]
-        if self.board.pieces[to_sq] is not None:
+        if to_sq_piece is not None:
             if piece.color == to_sq_piece.color:
                 return False
             else:
