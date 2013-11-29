@@ -4,7 +4,7 @@ Created on Jun 21, 2013
 @author: nick
 '''
 
-from utils import enum
+from utils import enum, scalar_mult_tuple
 
 colors = enum(WHITE=1, BLACK=-1)
 piece_types = enum(PAWN=0, KNIGHT=1, BISHOP=2, ROOK=3, QUEEN=4, KING=5)
@@ -53,12 +53,12 @@ class Pawn(ChessPiece): #Icky, pawns aren't piece_types, per-say!
         
     def move_patterns(self):
         if not self.has_moved:
-            return [(2,0), (1,0)]
+            return [scalar_mult_tuple(self.color, arg) for arg in [(2,0), (1,0)]]
         else:
-            return [(1,0)]
+            return [scalar_mult_tuple(self.color, (1,0))]
         
     def attack_patterns(self):
-        return [(1,1), (1,-1)]
+        return [scalar_mult_tuple(self.color, arg) for arg in [(1,1), (1,-1)]]
 
 class Knight(ChessPiece):
     def __init__(self, color, has_moved=False):

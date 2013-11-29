@@ -16,6 +16,9 @@ def ctl(i):
 
 def letter_to_number(s):
     return ord(s) - 97
+    
+def scalar_mult_tuple(alpha, tup):
+    return tuple(alpha*i for i in tup)
 
 ################## http://www.pygame.org/wiki/2DVectorClass ################## 
 class Vec2d(object):

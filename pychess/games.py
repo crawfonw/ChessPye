@@ -40,12 +40,23 @@ class VanillaChess(object):
     def is_pseudo_legal_board_position(self):
         pass
     
+    def move_piece(self, from_sq, to_sq):
+        if type(from_sq) == type(to_sq):
+            if type(from_sq) == tuple:
+                return self.move_piece_coordinate(from_sq, to_sq)
+            elif type(from_sq) == str:
+                return self.move_piece_algebraic(from_sq, to_sq)
+            else:
+                raise TypeError("Invalid square specification data type %s" % type(from_sq))
+        else:
+            raise TypeError("from_sq and to_sq datatypes must match! (Inputs were %s and %s.)" % (type(from_sq), type(to_sq)))
+    
     def move_piece_algebraic(self, from_sq, to_sq):
         #i.e. d1-d4 not Qd4
         return self.move_piece(self.board.algebraic_to_coordinate_square(from_sq), \
                           self.board.algebraic_to_coordinate_square(to_sq))
     
-    def move_piece(self, from_sq, to_sq):
+    def move_piece_coordinate(self, from_sq, to_sq):
         if from_sq == to_sq:
             return False
         if not self.board.square_is_on_board(from_sq):
