@@ -5,7 +5,7 @@ Created on Jun 20, 2013
 '''
 
 from boards import ClassicBoard
-from pieces import colors, move_types
+from pieces import colors, move_types, piece_types
 from utils import Vec2d
 
 from math import copysign
@@ -19,10 +19,10 @@ class VanillaChess(object):
         self.board = ClassicBoard()
         self.white_player = white_player
         self.black_player = black_player
-        self.white_kingside_castle = True
-        self.white_queenside_castle = True
-        self.black_kingside_castle = True
-        self.black_queenside_castle = True
+        self.white_can_kingside_castle = True
+        self.white_can_queenside_castle = True
+        self.black_can_kingside_castle = True
+        self.black_can_queenside_castle = True
         self.fifty_move_counter = 0
         self.white_in_checkmate = False
         self.black_in_checkmate = False
@@ -39,6 +39,11 @@ class VanillaChess(object):
     def is_pseudo_legal_board_position(self):
         pass
     
+    def move_piece_algebraic(self, from_sq, to_sq):
+        #i.e. d1-d4 not Qd4
+        return self.move_piece(self.board.algebraic_to_coordinate_square(from_sq), \
+                          self.board.algebraic_to_coordinate_square(to_sq))
+    
     def move_piece(self, from_sq, to_sq):
         if from_sq == to_sq:
             return False
@@ -46,10 +51,76 @@ class VanillaChess(object):
             return False
         piece = self.board.pieces[from_sq]
         if piece is not None:
-            if self.piece_can_move_from_to(piece, from_sq, to_sq):
-                piece.has_moved = True
+            #Special case for castling
+            if piece.piece_type == piece_types.KING and (Vec2d(from_sq) - Vec2d(to_sq)).get_length() == Vec2d(0,2).get_length():
+                if self.piece_can_move_from_to(piece, from_sq, to_sq):
+                    if piece.color == colors.WHITE:
+                        if self.white_can_kingside_castle and Vec2d(from_sq) - Vec2d(to_sq) == Vec2d(0,2):
+                                rook_loc = Vec2d(to_sq) + Vec2d((0,1))
+                                rook_dest = Vec2d(to_sq) + Vec2d((0,-1))
+                        elif self.white_can_queenside_castle and Vec2d(from_sq) - Vec2d(to_sq) == Vec2d(0,-2):
+                            rook_loc = Vec2d(to_sq) + Vec2d((0,-2))
+                            rook_dest = Vec2d(to_sq) + Vec2d((0,1))
+                        else:
+                            return False
+                    elif piece.color == colors.BLACK:
+                        if self.black_can_kingside_castle and Vec2d(from_sq) - Vec2d(to_sq) == Vec2d(0,2):
+                            rook_loc = Vec2d(to_sq) + Vec2d((0,1))
+                            rook_dest = Vec2d(to_sq) + Vec2d((0,-1))
+                        elif self.black_can_queenside_castle and Vec2d(from_sq) - Vec2d(to_sq) == Vec2d(0,-2):
+                            rook_loc = Vec2d(to_sq) + Vec2d((0,-2))
+                            rook_dest = Vec2d(to_sq) + Vec2d((0,1))
+                        else:
+                            return False
+                    
+                    rook = self.board.pieces[tuple(rook_loc)]
+                    if rook.piece_type != piece_types.ROOK:
+                        raise ValueError('Cannot castle without Rook')
+                    
+                    self.board.pieces[from_sq] = None
+                    self.board.pieces[to_sq] = piece
+                    piece.has_moved = True
+                    
+                    self.board.pieces[rook_loc] = None
+                    self.board.pieces[rook_dest] = rook
+                    rook.has_moved = True
+                    
+                    if piece.color == colors.WHITE:
+                        self.white_can_kingside_castle = False
+                        self.white_can_queenside_castle = False
+                    elif piece.color == colors.BLACK:
+                        self.black_can_kingside_castle = False
+                        self.black_can_queenside_castle = False
+                    return True
+            elif self.piece_can_move_from_to(piece, from_sq, to_sq):
                 self.board.pieces[from_sq] = None
                 self.board.pieces[to_sq] = piece
+                
+                if piece.color == colors.WHITE:
+                    if piece.piece_type == piece_types.KING:
+                        self.white_can_kingside_castle = False
+                        self.white_can_queenside_castle = False
+                    #Hard-coded
+                    #TODO: Un-hardcode rook locations for support for possible variants 
+                    elif piece.piece_type == piece_types.ROOK:
+                        if not piece.has_moved:
+                            if from_sq == (0,7):
+                                self.white_can_kingside_castle = False
+                            elif from_sq == (0,0):
+                                self.white_can_queenside_castle = False
+                elif piece.color == colors.BLACK:
+                    if piece.piece_type == piece_types.KING:
+                        self.black_can_kingside_castle = False
+                        self.black_can_queenside_castle = False
+                    elif piece.piece_type == piece_types.ROOK:
+                        if not piece.has_moved:
+                            if from_sq == (7,7):
+                                self.black_can_kingside_castle = False
+                            elif from_sq == (7,0):
+                                self.black_can_queenside_castle = False
+                
+                piece.has_moved = True
+                
                 return True
         return False
     
@@ -65,6 +136,9 @@ class VanillaChess(object):
             pattern_types = piece.move_patterns()
         
         if piece.move_type == move_types.EXACT:
+            #The following logic might not work for weird moving piece_types
+            #(i.e. Knight) if they cannot jump
+            #TODO: verify/fix this
             for move in pattern_types:
                 if Vec2d(move) + Vec2d(from_sq) == Vec2d(to_sq):
                     if piece.can_jump:
@@ -73,7 +147,7 @@ class VanillaChess(object):
                         #This piece can move here assuming it is unblocked
                         #Now find the straight-line path and make sure nothing is blocking
                         f = lambda x : int(copysign(1,x)) if x != 0 else 0
-                        unit_move = Vec2d(f(move[0]), f(move[1]))
+                        unit_move = Vec2d(f(move[0]), f(move[1])) #unit vector in direction of move
                         curr_sq = Vec2d(from_sq) + unit_move
                         while tuple(curr_sq) != to_sq:
                             if not self.board.square_is_on_board(tuple(curr_sq)):

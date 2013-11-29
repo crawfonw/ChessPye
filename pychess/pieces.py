@@ -7,7 +7,7 @@ Created on Jun 21, 2013
 from utils import enum
 
 colors = enum(WHITE=1, BLACK=-1)
-pieces = enum(PAWN=0, KNIGHT=1, BISHOP=2, ROOK=3, QUEEN=4, KING=5)
+piece_types = enum(PAWN=0, KNIGHT=1, BISHOP=2, ROOK=3, QUEEN=4, KING=5)
 move_types = enum(MAX=0, EXACT=1)
 
 class ChessPiece(object):
@@ -47,9 +47,9 @@ class ChessPiece(object):
     def attack_patterns(self):
         return
 
-class Pawn(ChessPiece): #Icky, pawns aren't pieces, per-say!
+class Pawn(ChessPiece): #Icky, pawns aren't piece_types, per-say!
     def __init__(self, color, has_moved=False):
-        super(Pawn, self).__init__('Pawn', color, pieces.PAWN, 1, 9817, '', has_moved, move_types.EXACT)
+        super(Pawn, self).__init__('Pawn', color, piece_types.PAWN, 1, 9817, '', has_moved, move_types.EXACT)
         
     def move_patterns(self):
         if not self.has_moved:
@@ -62,7 +62,7 @@ class Pawn(ChessPiece): #Icky, pawns aren't pieces, per-say!
 
 class Knight(ChessPiece):
     def __init__(self, color, has_moved=False):
-        super(Knight, self).__init__('Knight', color, pieces.KNIGHT, 3, 9816, 'N', has_moved, move_types.EXACT, True)
+        super(Knight, self).__init__('Knight', color, piece_types.KNIGHT, 3, 9816, 'N', has_moved, move_types.EXACT, True)
         
     def move_patterns(self):
         return [(2,1), (2,-1), (-2,1), (-2,-1), (1,2), (-1,2), (1,-2), (-1,-2)]
@@ -71,7 +71,7 @@ class Knight(ChessPiece):
 
 class Bishop(ChessPiece):
     def __init__(self, color, has_moved=False):
-        super(Bishop, self).__init__('Bishop', color, pieces.BISHOP, 3, 9815, 'B', has_moved, move_types.MAX)
+        super(Bishop, self).__init__('Bishop', color, piece_types.BISHOP, 3, 9815, 'B', has_moved, move_types.MAX)
         
     def move_patterns(self):
         return [(1,1), (1,-1), (-1,1), (-1,-1)]
@@ -80,7 +80,7 @@ class Bishop(ChessPiece):
         
 class Rook(ChessPiece):
     def __init__(self, color, has_moved=False):
-        super(Rook, self).__init__('Rook', color, pieces.ROOK, 5, 9814, 'R', has_moved, move_types.MAX)
+        super(Rook, self).__init__('Rook', color, piece_types.ROOK, 5, 9814, 'R', has_moved, move_types.MAX)
         
     def move_patterns(self):
         return [(1,0), (-1,0), (0,1), (0,-1)]
@@ -89,7 +89,7 @@ class Rook(ChessPiece):
 
 class Queen(ChessPiece):
     def __init__(self, color, has_moved=False):
-        super(Queen, self).__init__('Queen', color, pieces.QUEEN, 9, 9813, 'Q', has_moved, move_types.MAX)
+        super(Queen, self).__init__('Queen', color, piece_types.QUEEN, 9, 9813, 'Q', has_moved, move_types.MAX)
         
     def move_patterns(self):
         return [(1,0), (-1,0), (0,1), (0,-1), (1,1), (1,-1), (-1,1), (-1,-1)]
@@ -98,9 +98,9 @@ class Queen(ChessPiece):
 
 class King(ChessPiece):
     def __init__(self, color, has_moved=False):
-        super(King, self).__init__('King', color, pieces.KING, 999, 9812, 'K', has_moved, move_types.EXACT)
+        super(King, self).__init__('King', color, piece_types.KING, 999, 9812, 'K', has_moved, move_types.EXACT)
         
     def move_patterns(self):
-        return [(1,0), (-1,0), (0,1), (0,-1), (1,1), (1,-1), (-1,1), (-1,-1)]
+        return [(1,0), (-1,0), (0,1), (0,-1), (1,1), (1,-1), (-1,1), (-1,-1), (0,2), (0,-2)]
     
     attack_patterns = move_patterns

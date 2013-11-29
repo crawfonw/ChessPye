@@ -6,7 +6,7 @@ Created on Jun 22, 2013
 import unittest
 
 from pychess.games import VanillaChess
-from pychess.pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors
+from pychess.pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors, piece_types
 
 class TestPieceMovement(unittest.TestCase):
 
@@ -265,16 +265,31 @@ class TestPieceMovement(unittest.TestCase):
         self.assertFalse(self.game.move_piece((3,3), (4,2)), 'Bishop cannot move down right one square')
         self.assertFalse(self.game.move_piece((3,3), (6,0)), 'Bishop cannot move down right more than one square')
     
-    def testKingSideCastle(self):
-        self.fail('Not implemented')
+    def testCanKingSideCastle(self):
+        #self.game.board.set_square_to_piece('h1', Rook(colors.WHITE))
+        self.game.board.pieces[(0,7)] = Rook(colors.WHITE)
+        self.game.board.set_square_to_piece('e1', King(colors.WHITE))
         
-    def testQueenSideCastle(self):
+        print self.game.board
+        print repr(self.game.board)
+        
+        self.assertTrue(self.game.move_piece_algebraic('e1', 'g1'), 'King should be able to castle')
+        
+        print self.game.board
+        
+        self.assertTrue(self.game.board.get_square('g1').piece_type == piece_types.KING, 'Piece on g1 should be a King')
+        self.assertTrue(self.game.board.get_square('f1').piece_type == piece_types.ROOK, 'Piece on f1 should be a Rook')
+        
+    def testCanQueenSideCastle(self):
         self.fail('Not implemented')
         
     def testCannotCastleWhenPiecesBlocking(self):
         self.fail('Not implemented')
         
     def testCannotCastleWhenKingOrRookHasMoved(self):
+        self.fail('Not implemented')
+        
+    def testKingCannotMoveTwoSquaresNormally(self):
         self.fail('Not implemented')
         
 

@@ -107,6 +107,22 @@ class TestCoordinateToAlgebraicConversions(unittest.TestCase):
     def tearDown(self):
         pass
     
+    def testConvertCoordinateToAlgebraicSquare(self):
+        letters = ['a','b','c','d','e','f','g','h']
+        for i in range(8):
+            for j in range(8):
+                alg = '%s%s' % (letters[i], j+1)
+                conv = self.board.coordinate_to_algebraic_square((j,i))
+                self.assertEqual(alg, conv, '%s should be %s' % (conv, alg))
+    
+    def testConvertAlgebraicToCoordinateSquare(self):
+        letters = ['a','b','c','d','e','f','g','h']
+        for i in range(len(letters)):
+            for j in range(8):
+                coords = (j,i)
+                conv = self.board.algebraic_to_coordinate_square('%s%s' % (letters[i], j+1))
+                self.assertEqual(conv, coords, '%s should be %s' % (conv, coords))
+    
     def testConvertCoordinateToAlgebraicMoveOnly(self):
         self.board.pieces[(0,6)] = Knight(colors.WHITE)
         
@@ -114,7 +130,7 @@ class TestCoordinateToAlgebraicConversions(unittest.TestCase):
         f3 = self.board.get_coordinate_piece_tuple(2,5)
         
         correct_move = 'Nf3'
-        converted_move = self.board.coordinate_to_algebraic(f3, knight)
+        converted_move = self.board.coordinate_to_algebraic_move(f3, knight)
         self.assertEqual(correct_move, converted_move, 'Move notation %s should be %s' % (converted_move, correct_move))
     
     def testConvertCoordinateToAlgebraicMoveOnlyPawn(self):
@@ -128,7 +144,7 @@ class TestCoordinateToAlgebraicConversions(unittest.TestCase):
         pawn = self.board.get_coordinate_piece_tuple(3,7)
         
         correct_move = 'Rxh4'
-        converted_move = self.board.coordinate_to_algebraic(pawn, rook)
+        converted_move = self.board.coordinate_to_algebraic_move(pawn, rook)
         self.assertEqual(correct_move, converted_move, 'Move notation %s should be %s' % (converted_move, correct_move))
         
     def testConvertCoordinateToAlgebraicWithCapturePawn(self):

@@ -14,6 +14,9 @@ def enum(**enums):
 def ctl(i):
     return chr(97 + i)
 
+def letter_to_number(s):
+    return ord(s) - 97
+
 ################## http://www.pygame.org/wiki/2DVectorClass ################## 
 class Vec2d(object):
     """2d vector class, supports vector and scalar operators,
