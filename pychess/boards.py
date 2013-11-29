@@ -66,7 +66,6 @@ class Board(object):
     
     def set_square_to_piece(self, algebraic, piece):
         square = self.algebraic_to_coordinate_square(algebraic)
-        print square
         if self.square_is_on_board(square):
             self.pieces[square] = piece
             return True

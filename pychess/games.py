@@ -52,30 +52,35 @@ class VanillaChess(object):
         piece = self.board.pieces[from_sq]
         if piece is not None:
             #Special case for castling
-            if piece.piece_type == piece_types.KING and (Vec2d(from_sq) - Vec2d(to_sq)).get_length() == Vec2d(0,2).get_length():
+            move_vector = Vec2d(to_sq) - Vec2d(from_sq)
+            if piece.piece_type == piece_types.KING and move_vector.get_length() == 2:
+                if piece.has_moved:
+                    return False
                 if self.piece_can_move_from_to(piece, from_sq, to_sq):
                     if piece.color == colors.WHITE:
-                        if self.white_can_kingside_castle and Vec2d(from_sq) - Vec2d(to_sq) == Vec2d(0,2):
-                                rook_loc = Vec2d(to_sq) + Vec2d((0,1))
-                                rook_dest = Vec2d(to_sq) + Vec2d((0,-1))
-                        elif self.white_can_queenside_castle and Vec2d(from_sq) - Vec2d(to_sq) == Vec2d(0,-2):
-                            rook_loc = Vec2d(to_sq) + Vec2d((0,-2))
-                            rook_dest = Vec2d(to_sq) + Vec2d((0,1))
+                        if self.white_can_kingside_castle and move_vector == Vec2d(0,2):
+                                rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
+                                rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
+                        elif self.white_can_queenside_castle and move_vector == Vec2d(0,-2):
+                            rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
+                            rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
                         else:
                             return False
                     elif piece.color == colors.BLACK:
-                        if self.black_can_kingside_castle and Vec2d(from_sq) - Vec2d(to_sq) == Vec2d(0,2):
-                            rook_loc = Vec2d(to_sq) + Vec2d((0,1))
-                            rook_dest = Vec2d(to_sq) + Vec2d((0,-1))
-                        elif self.black_can_queenside_castle and Vec2d(from_sq) - Vec2d(to_sq) == Vec2d(0,-2):
-                            rook_loc = Vec2d(to_sq) + Vec2d((0,-2))
-                            rook_dest = Vec2d(to_sq) + Vec2d((0,1))
+                        if self.black_can_kingside_castle and move_vector == Vec2d(0,2):
+                            rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
+                            rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
+                        elif self.black_can_queenside_castle and move_vector == Vec2d(0,-2):
+                            rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
+                            rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
                         else:
                             return False
                     
-                    rook = self.board.pieces[tuple(rook_loc)]
-                    if rook.piece_type != piece_types.ROOK:
-                        raise ValueError('Cannot castle without Rook')
+                    if not self.board.square_is_on_board(rook_loc):
+                        return False
+                    rook = self.board.pieces[rook_loc]
+                    if rook is None or rook.piece_type != piece_types.ROOK or rook.has_moved:
+                        return False
                     
                     self.board.pieces[from_sq] = None
                     self.board.pieces[to_sq] = piece

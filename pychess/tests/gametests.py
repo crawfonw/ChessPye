@@ -266,32 +266,66 @@ class TestPieceMovement(unittest.TestCase):
         self.assertFalse(self.game.move_piece((3,3), (6,0)), 'Bishop cannot move down right more than one square')
     
     def testCanKingSideCastle(self):
-        #self.game.board.set_square_to_piece('h1', Rook(colors.WHITE))
-        self.game.board.pieces[(0,7)] = Rook(colors.WHITE)
+        self.game.board.set_square_to_piece('h1', Rook(colors.WHITE))
         self.game.board.set_square_to_piece('e1', King(colors.WHITE))
         
-        print self.game.board
-        print repr(self.game.board)
-        
         self.assertTrue(self.game.move_piece_algebraic('e1', 'g1'), 'King should be able to castle')
-        
-        print self.game.board
-        
+        self.assertEqual(self.game.board.get_square('h1'), None, 'h1 should be NoneType but is %s' % self.game.board.get_square('h1'))
         self.assertTrue(self.game.board.get_square('g1').piece_type == piece_types.KING, 'Piece on g1 should be a King')
         self.assertTrue(self.game.board.get_square('f1').piece_type == piece_types.ROOK, 'Piece on f1 should be a Rook')
         
     def testCanQueenSideCastle(self):
-        self.fail('Not implemented')
+        self.game.board.set_square_to_piece('a1', Rook(colors.WHITE))
+        self.game.board.set_square_to_piece('e1', King(colors.WHITE))
+        
+        self.assertTrue(self.game.move_piece_algebraic('e1', 'c1'), 'King should be able to castle')
+        self.assertEqual(self.game.board.get_square('a1'), None, 'a1 should be NoneType but is %s' % self.game.board.get_square('h1'))
+        self.assertTrue(self.game.board.get_square('c1').piece_type == piece_types.KING, 'Piece on g1 should be a King')
+        self.assertTrue(self.game.board.get_square('d1').piece_type == piece_types.ROOK, 'Piece on f1 should be a Rook')
         
     def testCannotCastleWhenPiecesBlocking(self):
-        self.fail('Not implemented')
+        self.game.board.set_square_to_piece('a1', Rook(colors.WHITE))
+        self.game.board.set_square_to_piece('h1', Rook(colors.WHITE))
+        self.game.board.set_square_to_piece('e1', King(colors.WHITE))
+        self.game.board.set_square_to_piece('d1', Queen(colors.WHITE))
+        self.game.board.set_square_to_piece('f1', Bishop(colors.WHITE))
         
-    def testCannotCastleWhenKingOrRookHasMoved(self):
-        self.fail('Not implemented')
+        self.assertFalse(self.game.move_piece_algebraic('e1', 'g1'), 'King should not be able to king side castle')
+        self.assertFalse(self.game.move_piece_algebraic('e1', 'c1'), 'King should not be able to queen side castle')
+        
+        self.assertTrue(self.game.board.get_square('e1').piece_type == piece_types.KING, 'Piece on g1 should be a King')
+        self.assertTrue(self.game.board.get_square('a1').piece_type == piece_types.ROOK, 'Piece on a1 should be a Rook')
+        self.assertTrue(self.game.board.get_square('h1').piece_type == piece_types.ROOK, 'Piece on h1 should be a Rook')
+        self.assertTrue(self.game.board.get_square('d1').piece_type == piece_types.QUEEN, 'Piece on d1 should be a Queen')
+        self.assertTrue(self.game.board.get_square('f1').piece_type == piece_types.BISHOP, 'Piece on f1 should be a Bishop')
+        
+    def testCannotCastleWhenKingHasMoved(self):
+        self.game.board.set_square_to_piece('a1', Rook(colors.WHITE, has_moved=True))
+        self.game.board.set_square_to_piece('h1', Rook(colors.WHITE, has_moved=True))
+        self.game.board.set_square_to_piece('e1', King(colors.WHITE))
+        
+        self.assertFalse(self.game.move_piece_algebraic('e1', 'g1'), 'King should not be able to king side castle')
+        self.assertFalse(self.game.move_piece_algebraic('e1', 'c1'), 'King should not be able to queen side castle')
+        
+    def testCannotCastleWhenRooksHaveMoved(self):
+        self.game.board.set_square_to_piece('a1', Rook(colors.WHITE))
+        self.game.board.set_square_to_piece('h1', Rook(colors.WHITE))
+        self.game.board.set_square_to_piece('e1', King(colors.WHITE, has_moved=True))
+        
+        self.assertFalse(self.game.move_piece_algebraic('e1', 'g1'), 'King should not be able to king side castle')
+        self.assertFalse(self.game.move_piece_algebraic('e1', 'c1'), 'King should not be able to queen side castle')
         
     def testKingCannotMoveTwoSquaresNormally(self):
-        self.fail('Not implemented')
+        self.game.board.set_square_to_piece('e4', King(colors.WHITE))
         
+        self.assertFalse(self.game.move_piece_algebraic('e4', 'g4'), 'King should not be able to move 2 squares')
+        self.assertFalse(self.game.move_piece_algebraic('e4', 'c4'), 'King should not be able to move 2 squares')
+        
+    def testKingCannotMoveTwoSquaresNormallyFromHomeSquare(self):
+        self.game.board.set_square_to_piece('e1', King(colors.WHITE))
+        
+        self.assertFalse(self.game.move_piece_algebraic('e1', 'g1'), 'King should not be able to move 2 squares')
+        self.assertFalse(self.game.move_piece_algebraic('e1', 'c1'), 'King should not be able to move 2 squares')
 
 if __name__ == "__main__":
     unittest.main()
