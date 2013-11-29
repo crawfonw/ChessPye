@@ -26,6 +26,7 @@ class VanillaChess(object):
         self.fifty_move_counter = 0
         self.white_in_checkmate = False
         self.black_in_checkmate = False
+        self.last_move = (None, None) #to square, move vector
         
     def __repr__(self):
         return 'VanillaChess(white_player=%r, black_player=%r)' % (self.white_player, self.black_player) 
@@ -51,8 +52,16 @@ class VanillaChess(object):
             return False
         piece = self.board.pieces[from_sq]
         if piece is not None:
-            #Special case for castling
             move_vector = Vec2d(to_sq) - Vec2d(from_sq)
+            #Special case for en passante
+            if piece.piece_type == piece_types.PAWN and move_vector.get_length_sqrd() == 2:
+                if move_vector == Vec2d(1,1):
+                    other_piece = self.board.pieces[tuple(Vec2d(from_sq) + Vec2d(0,1))]
+                    if other_piece is not None and other_piece.piece_type == piece_types.PAWN:
+                        pass
+                elif move_vector == Vec2d(1,-1):
+                    pass
+            #Special case for castling
             if piece.piece_type == piece_types.KING and move_vector.get_length() == 2:
                 if piece.has_moved:
                     return False

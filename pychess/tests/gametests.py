@@ -67,7 +67,25 @@ class TestPieceMovement(unittest.TestCase):
         
         self.assertFalse(self.game.move_piece((1,3), (3,3)), 'Pawn is blocked')
         
-    def testEnPassent(self):
+    def testEnPassentToLeft(self):
+        self.fail('Not implemented')
+        
+    def testEnPassentToRight(self):
+        self.fail('Not implemented')
+        
+    def testCannotEnPassentAfterMoreThanOneTurn(self):
+        self.fail('Not implemented')
+        
+    def testCannotEnPassentPawnThatHasMovedTwoSpacesOneAtATime(self):
+        self.fail('Not implemented')
+        
+    def testCannotEnPassentNonPawn(self):
+        self.fail('Not implemented')
+        
+    def testCannotEnPassentOwnPiece(self):
+        self.fail('Not implemented')
+        
+    def testCannotAttackEmptySquare(self):
         self.fail('Not implemented')
         
     def testKnightCanJump(self):
