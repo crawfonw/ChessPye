@@ -5,8 +5,9 @@ Created on Jun 22, 2013
 
 '''
 
-import operator
 import math
+import operator
+import pgn
 
 def enum(**enums):
     return type('Enum', (), enums)
@@ -19,6 +20,12 @@ def letter_to_number(s):
     
 def scalar_mult_tuple(alpha, tup):
     return tuple(alpha*i for i in tup)
+    
+def get_list_of_moves_from_pgn(pgn_path): #includes comments & W/L/D result
+    pgn_text = open(pgn_path).read()
+    pgn_games = pgn.loads(pgn_text)
+    return [game.moves for game in pgn_games]
+        
 
 ################## http://www.pygame.org/wiki/2DVectorClass ################## 
 class Vec2d(object):
