@@ -6,6 +6,7 @@ Created on Jun 20, 2013
 
 from chesspye.board.boards import ClassicBoard
 from rules import VanillaRules
+from chesspye.utils import Stack
 
 class VanillaChess(object):
     '''
@@ -17,8 +18,7 @@ class VanillaChess(object):
         self.rules = VanillaRules()
         self.white_player = white_player
         self.black_player = black_player
-        
-        self.last_move = (None, None) #to square, move vector
+        self.moves = Stack()
         
     def __repr__(self):
         return 'VanillaChess(white_player=%r, black_player=%r)' % (self.white_player, self.black_player) 

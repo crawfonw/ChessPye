@@ -26,6 +26,34 @@ def get_list_of_moves_from_pgn(pgn_path): #includes comments & W/L/D result
     pgn_games = pgn.loads(pgn_text)
     return [game.moves for game in pgn_games]
         
+class Stack(object):
+    
+    def __init__(self, initial_set=[]):
+        if isinstance(initial_set, list):
+            self.objs = initial_set
+        else:
+            self.objs = [initial_set]
+        
+    def push(self, obj):
+        self.objs.append(obj)
+        
+    def pop(self):
+        return self.objs.pop()
+    
+    def peek(self):
+        return self.objs[-1]
+        
+    def is_empty(self):
+        return len(self.objs) == 0
+    
+    def __repr__(self):
+        return '%s(initial_set=%s)' % (self.__class__.__name__, self.objs)
+    
+    def __str__(self):
+        return str(self.objs)
+    
+    def __iter__(self):
+        return iter(self.objs)
 
 ################## http://www.pygame.org/wiki/2DVectorClass ################## 
 class Vec2d(object):
