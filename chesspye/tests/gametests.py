@@ -5,8 +5,8 @@ Created on Jun 22, 2013
 '''
 import unittest
 
-from pychess.games import VanillaChess
-from pychess.pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors, piece_types
+from chesspye.game.games import VanillaChess
+from chesspye.board.pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors, piece_types
 
 class TestPieceMovement(unittest.TestCase):
 

@@ -5,7 +5,7 @@ Created on Jun 20, 2013
 '''
 
 from pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors
-from utils import ctl, letter_to_number
+from chesspye.utils import ctl, letter_to_number
 
 class Board(object):
     

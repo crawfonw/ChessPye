@@ -4,9 +4,9 @@ Created on Jun 20, 2013
 @author: nick
 '''
 
-from boards import ClassicBoard
-from pieces import colors, move_types, piece_types
-from utils import Vec2d
+from chesspye.board.boards import ClassicBoard
+from chesspye.board.pieces import colors, move_types, piece_types
+from chesspye.utils import Vec2d
 
 from math import copysign
 

@@ -4,7 +4,7 @@ Created on Jun 21, 2013
 @author: nick
 '''
 
-from utils import enum, scalar_mult_tuple
+from chesspye.utils import enum, scalar_mult_tuple
 
 colors = enum(WHITE=1, BLACK=-1)
 piece_types = enum(PAWN=0, KNIGHT=1, BISHOP=2, ROOK=3, QUEEN=4, KING=5)
