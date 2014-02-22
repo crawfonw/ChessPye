@@ -47,7 +47,7 @@ class ChessPiece(object):
     def attack_patterns(self):
         return
 
-class Pawn(ChessPiece): #Icky, pawns aren't piece_types, per-say!
+class Pawn(ChessPiece):
     def __init__(self, color, has_moved=False):
         super(Pawn, self).__init__('Pawn', color, piece_types.PAWN, 1, 9817, '', has_moved, move_types.EXACT)
         
