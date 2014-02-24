@@ -2,6 +2,16 @@
 Created on Feb 22, 2014
 
 @author: Nick Crawford
+
+Note on the move_rules dict:
+    Each rule method must consume (from_sq, to_sq, move_vector, piece, board).
+    piece - instance of a Piece
+    from_sq, to_sq - each a tuple of coordinates of starting and ending pos
+    board - the current board state of the game
+    move_vector - computed via from_sq and to_sq in main move handling method
+    
+    If more rules are added (i.e. for variants) they must be in the extended
+    rules class if you want them to interact with game_variables (duh)
 '''
 
 from chesspye.board.pieces import colors, move_types, piece_types
@@ -12,14 +22,14 @@ from math import copysign
 class Rules(object):
     
     def __init__(self):
-        self.rules_methods = {}
+        self.move_rules = {} #These are all checked every move
         self.game_variables = {}
         
-    def register_rules_method(self, f, name=None): #These are all checked every move
+    def register_move_rule(self, f, name=None):
         if name is None:
-            self.rules_methods[f.__name__] = f
+            self.move_rules[f.__name__] = f
         else:
-            self.rules_methods[name] = f
+            self.move_rules[name] = f
             
     def register_game_variable(self, name, val):
         self.game_variables[name] = val
@@ -33,6 +43,10 @@ class VanillaRules(Rules):
         self.register_game_variable('black_can_kingside_castle', True)
         self.register_game_variable('black_can_queenside_castle', True)
         self.register_game_variable('fifty_move_counter', 0)
+        
+        self.register_move_rule(self.handle_en_passante, 'en_passante')
+        self.register_move_rule(self.handle_castle, 'castle')
+        
         
     def move_piece(self, from_sq, to_sq, board):
         if type(from_sq) == type(to_sq):
@@ -49,7 +63,7 @@ class VanillaRules(Rules):
         #i.e. d1-d4 not Qd4
         return self.move_piece_coordinate(board.algebraic_to_coordinate_square(from_sq), \
                           board.algebraic_to_coordinate_square(to_sq), board)
-    
+
     def move_piece_coordinate(self, from_sq, to_sq, board):
         if from_sq == to_sq:
             return False
@@ -58,60 +72,13 @@ class VanillaRules(Rules):
         piece = board.pieces[from_sq]
         if piece is not None:
             move_vector = Vec2d(to_sq) - Vec2d(from_sq)
-            #Special case for en passante
-            if piece.piece_type == piece_types.PAWN and move_vector.get_length_sqrd() == 2:
-                if move_vector == Vec2d(1,1):
-                    other_piece = board.pieces[tuple(Vec2d(from_sq) + Vec2d(0,1))]
-                    if other_piece is not None and other_piece.piece_type == piece_types.PAWN:
-                        pass
-                elif move_vector == Vec2d(1,-1):
-                    pass
-            #Special case for castling
-            if piece.piece_type == piece_types.KING and move_vector.get_length() == 2:
-                if piece.has_moved():
-                    return False
-                if self.piece_can_move_from_to(piece, from_sq, to_sq, board):
-                    if piece.color == colors.WHITE:
-                        if self.game_variables['white_can_kingside_castle'] and move_vector == Vec2d(0,2):
-                                rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
-                                rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
-                        elif self.game_variables['white_can_queenside_castle'] and move_vector == Vec2d(0,-2):
-                            rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
-                            rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
-                        else:
-                            return False
-                    elif piece.color == colors.BLACK:
-                        if self.game_variables['black_can_kingside_castle'] and move_vector == Vec2d(0,2):
-                            rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
-                            rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
-                        elif self.game_variables['black_can_queenside_castle'] and move_vector == Vec2d(0,-2):
-                            rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
-                            rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
-                        else:
-                            return False
-                    
-                    if not board.square_is_on_board(rook_loc):
-                        return False
-                    rook = board.pieces[rook_loc]
-                    if rook is None or rook.piece_type != piece_types.ROOK or rook.has_moved():
-                        return False
-                    
-                    board.pieces[from_sq] = None
-                    board.pieces[to_sq] = piece
-                    piece.times_moved += 1
-                    
-                    board.pieces[rook_loc] = None
-                    board.pieces[rook_dest] = rook
-                    piece.times_moved += 1
-                    
-                    if piece.color == colors.WHITE:
-                        self.game_variables['white_can_kingside_castle'] = False
-                        self.game_variables['white_can_queenside_castle'] = False
-                    elif piece.color == colors.BLACK:
-                        self.game_variables['black_can_kingside_castle'] = False
-                        self.game_variables['black_can_queenside_castle'] = False
-                    return True
-            elif self.piece_can_move_from_to(piece, from_sq, to_sq, board):
+            
+            for name,rule in self.move_rules.items():
+                rule_applied = rule(from_sq, to_sq, move_vector, piece, board) 
+                if rule_applied is not None:
+                    return rule_applied
+                
+            if self.piece_can_move_from_to(piece, from_sq, to_sq, board):
                 board.pieces[from_sq] = None
                 board.pieces[to_sq] = piece
                 
@@ -191,3 +158,58 @@ class VanillaRules(Rules):
                             return False
                         curr_sq += dir_vec
                     return True
+                
+    def handle_en_passante(self, from_sq, to_sq, move_vector, piece, board):
+        if piece.piece_type == piece_types.PAWN and move_vector.get_length_sqrd() == 2:
+            if move_vector == Vec2d(1, 1):
+                other_piece = board.pieces[tuple(Vec2d(from_sq) + Vec2d(0, 1))]
+                if other_piece is not None and other_piece.piece_type == piece_types.PAWN:
+                    return 
+            elif move_vector == Vec2d(1, -1):
+                return
+            
+    def handle_castle(self, from_sq, to_sq, move_vector, piece, board):
+        if piece.piece_type == piece_types.KING and move_vector.get_length() == 2:
+            if piece.has_moved():
+                return False
+            if self.piece_can_move_from_to(piece, from_sq, to_sq, board):
+                if piece.color == colors.WHITE:
+                    if self.game_variables['white_can_kingside_castle'] and move_vector == Vec2d(0,2):
+                            rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
+                            rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
+                    elif self.game_variables['white_can_queenside_castle'] and move_vector == Vec2d(0,-2):
+                        rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
+                        rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
+                    else:
+                        return False
+                elif piece.color == colors.BLACK:
+                    if self.game_variables['black_can_kingside_castle'] and move_vector == Vec2d(0,2):
+                        rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
+                        rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
+                    elif self.game_variables['black_can_queenside_castle'] and move_vector == Vec2d(0,-2):
+                        rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
+                        rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
+                    else:
+                        return False
+                
+                if not board.square_is_on_board(rook_loc):
+                    return False
+                rook = board.pieces[rook_loc]
+                if rook is None or rook.piece_type != piece_types.ROOK or rook.has_moved():
+                    return False
+                
+                board.pieces[from_sq] = None
+                board.pieces[to_sq] = piece
+                piece.times_moved += 1
+                
+                board.pieces[rook_loc] = None
+                board.pieces[rook_dest] = rook
+                rook.times_moved += 1
+                
+                if piece.color == colors.WHITE:
+                    self.game_variables['white_can_kingside_castle'] = False
+                    self.game_variables['white_can_queenside_castle'] = False
+                elif piece.color == colors.BLACK:
+                    self.game_variables['black_can_kingside_castle'] = False
+                    self.game_variables['black_can_queenside_castle'] = False
+                return True
