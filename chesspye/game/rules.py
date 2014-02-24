@@ -68,23 +68,23 @@ class VanillaRules(Rules):
                     pass
             #Special case for castling
             if piece.piece_type == piece_types.KING and move_vector.get_length() == 2:
-                if piece.has_moved:
+                if piece.has_moved():
                     return False
                 if self.piece_can_move_from_to(piece, from_sq, to_sq, board):
                     if piece.color == colors.WHITE:
-                        if self.white_can_kingside_castle and move_vector == Vec2d(0,2):
+                        if self.game_variables['white_can_kingside_castle'] and move_vector == Vec2d(0,2):
                                 rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
                                 rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
-                        elif self.white_can_queenside_castle and move_vector == Vec2d(0,-2):
+                        elif self.game_variables['white_can_queenside_castle'] and move_vector == Vec2d(0,-2):
                             rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
                             rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
                         else:
                             return False
                     elif piece.color == colors.BLACK:
-                        if self.black_can_kingside_castle and move_vector == Vec2d(0,2):
+                        if self.game_variables['black_can_kingside_castle'] and move_vector == Vec2d(0,2):
                             rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
                             rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
-                        elif self.black_can_queenside_castle and move_vector == Vec2d(0,-2):
+                        elif self.game_variables['black_can_queenside_castle'] and move_vector == Vec2d(0,-2):
                             rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
                             rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
                         else:
@@ -93,23 +93,23 @@ class VanillaRules(Rules):
                     if not board.square_is_on_board(rook_loc):
                         return False
                     rook = board.pieces[rook_loc]
-                    if rook is None or rook.piece_type != piece_types.ROOK or rook.has_moved:
+                    if rook is None or rook.piece_type != piece_types.ROOK or rook.has_moved():
                         return False
                     
                     board.pieces[from_sq] = None
                     board.pieces[to_sq] = piece
-                    piece.has_moved = True
+                    piece.times_moved += 1
                     
                     board.pieces[rook_loc] = None
                     board.pieces[rook_dest] = rook
-                    rook.has_moved = True
+                    piece.times_moved += 1
                     
                     if piece.color == colors.WHITE:
-                        self.white_can_kingside_castle = False
-                        self.white_can_queenside_castle = False
+                        self.game_variables['white_can_kingside_castle'] = False
+                        self.game_variables['white_can_queenside_castle'] = False
                     elif piece.color == colors.BLACK:
-                        self.black_can_kingside_castle = False
-                        self.black_can_queenside_castle = False
+                        self.game_variables['black_can_kingside_castle'] = False
+                        self.game_variables['black_can_queenside_castle'] = False
                     return True
             elif self.piece_can_move_from_to(piece, from_sq, to_sq, board):
                 board.pieces[from_sq] = None
@@ -117,30 +117,30 @@ class VanillaRules(Rules):
                 
                 if piece.color == colors.WHITE:
                     if piece.piece_type == piece_types.KING:
-                        self.white_can_kingside_castle = False
-                        self.white_can_queenside_castle = False
+                        self.game_variables['white_can_kingside_castle'] = False
+                        self.game_variables['white_can_queenside_castle'] = False
                     #Hard-coded
                     #TODO: Un-hardcode rook locations for support for possible variants 
                     elif piece.piece_type == piece_types.ROOK:
-                        if not piece.has_moved:
+                        if not piece.has_moved():
                             if from_sq == (0,7):
-                                self.white_can_kingside_castle = False
+                                self.game_variables['white_can_kingside_castle'] = False
                             elif from_sq == (0,0):
-                                self.white_can_queenside_castle = False
+                                self.game_variables['white_can_queenside_castle'] = False
                 elif piece.color == colors.BLACK:
                     if piece.piece_type == piece_types.KING:
-                        self.black_can_kingside_castle = False
-                        self.black_can_queenside_castle = False
+                        self.game_variables['black_can_kingside_castle'] = False
+                        self.game_variables['black_can_queenside_castle'] = False
                     elif piece.piece_type == piece_types.ROOK:
-                        if not piece.has_moved:
+                        if not piece.has_moved():
                             if from_sq == (7,7):
-                                self.black_can_kingside_castle = False
+                                self.game_variables['black_can_kingside_castle'] = False
                             elif from_sq == (7,0):
-                                self.black_can_queenside_castle = False
+                                self.game_variables['black_can_queenside_castle'] = False
                 
-                piece.has_moved = True
-                
+                piece.times_moved += 1
                 return True
+            
         return False
     
     def piece_can_move_from_to(self, piece, from_sq, to_sq, board):

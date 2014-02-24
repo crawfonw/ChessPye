@@ -19,7 +19,7 @@ class ChessPiece(object):
         self.value = value
         self.utf_code_white = utf_code_white
         self.algebraic = algebraic
-        self.times_moved = 0
+        self.times_moved = times_moved
         self.move_type = move_type
         self.can_jump = can_jump
 
@@ -46,13 +46,16 @@ class ChessPiece(object):
     
     def attack_patterns(self):
         return
+    
+    def has_moved(self):
+        return self.times_moved > 0
 
 class Pawn(ChessPiece):
     def __init__(self, color, times_moved=0):
         super(Pawn, self).__init__('Pawn', color, piece_types.PAWN, 1, 9817, '', times_moved, move_types.EXACT)
         
     def move_patterns(self):
-        if not self.has_moved:
+        if not self.has_moved():
             return [scalar_mult_tuple(self.color, arg) for arg in [(2,0), (1,0)]]
         else:
             return [scalar_mult_tuple(self.color, (1,0))]

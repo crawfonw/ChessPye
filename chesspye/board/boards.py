@@ -9,9 +9,10 @@ from chesspye.utils import ctl, letter_to_number
 
 class Board(object):
     
-    def __init__(self, width, height):
+    def __init__(self, width, height, pretty_print=True):
         self.width = width
         self.height = height
+        self.pretty_print = pretty_print
         self.pieces = {}
         self.clear_board()
     
@@ -21,7 +22,7 @@ class Board(object):
             s += '%s ' % (i + 1)
             for j in range(self.width): #col
                 if self.pieces[(i,j)] is not None:
-                    s += '| %s ' % self.pieces[(i,j)].__unicode__()
+                    s += '| %s ' % self.piece_str(self.pieces[(i,j)])
                 else:
                     s += '|   '
             s += '|\n  --'
@@ -76,6 +77,12 @@ class Board(object):
         if self.square_is_on_board(square):
             return self.pieces[square]
         return None
+    
+    def piece_str(self, piece):
+        if self.pretty_print:
+            return unicode(piece)
+        else:
+            return str(piece)
 
 class ClassicBoard(Board):
     
