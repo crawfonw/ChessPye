@@ -7,7 +7,6 @@ Created on Jun 20, 2013
 from chesspye.board.boards import ClassicBoard
 from chesspye.board.pieces import piece_types, colors
 from rules import VanillaRules
-from chesspye.utils import Stack
 
 class VanillaChess(object):
 
@@ -16,17 +15,16 @@ class VanillaChess(object):
         self.rules = VanillaRules()
         self.white_player = white_player
         self.black_player = black_player
-        self.moves = Stack() #(Piece, from_sq, to_sq)
         
     def __repr__(self):
         return 'VanillaChess(white_player=%r, black_player=%r)' % (self.white_player, self.black_player) 
     
     def handle_pawn_promotion(self):
-        last_move == self.moves.peek() 
+        last_move = self.moves.peek() 
         if last_move[0].piece_type == piece_types.PAWN:
             if last_move[0].color == colors.WHITE:
                 if last_move[2][0] == self.board.height - 1:
-                     self.dispatch_promotion_choice()
+                    self.dispatch_promotion_choice()
             elif last_move[0].color == colors.BLACK:
                 if last_move[2][0] == 0:
                     self.dispatch_promotion_choice()

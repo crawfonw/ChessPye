@@ -5,7 +5,7 @@ Created on Jun 20, 2013
 '''
 
 from pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors, piece_types
-from chesspye.utils import ctl, letter_to_number
+from chesspye.utils import ctl, letter_to_number, Stack
 
 class Board(object):
     
@@ -15,6 +15,7 @@ class Board(object):
         self.pretty_print = pretty_print
         self.pieces = {}
         self.kings = {}
+        self.moves = Stack() #(Piece, from_sq, to_sq)
         self.clear_board()
     
     def __str__(self):
@@ -64,6 +65,7 @@ class Board(object):
                 self.pieces[(i,j)] = None
         for i in self.kings.keys(): #explicit
             self.kings[i] = None
+        self.moves.objs = []
                 
     def square_is_on_board(self, square):
         return square[0] < self.width and square[0] >= 0 and square[1] < self.height and square[1] >= 0
