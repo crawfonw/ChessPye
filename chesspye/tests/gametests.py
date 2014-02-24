@@ -434,6 +434,89 @@ class TestPieceMovement(unittest.TestCase):
         
         self.assertFalse(self.game.rules.move_piece('e1', 'g1', self.game.board), 'King should not be able to move 2 squares')
         self.assertFalse(self.game.rules.move_piece('e1', 'c1', self.game.board), 'King should not be able to move 2 squares')
+        
+    def testKingCannotCastleThroughCheck(self):
+        self.game.board.set_square_to_piece('h1', Rook(colors.WHITE))
+        self.game.board.set_square_to_piece('e1', King(colors.WHITE))
+        self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('e1')
+        self.game.board.set_square_to_piece('f8', Rook(colors.BLACK))
+        
+        self.assertFalse(self.game.rules.move_piece('e1', 'g1', self.game.board), 'King should not be able to castle through check')
+        self.assertTrue(self.game.board.get_square('e1').piece_type == piece_types.KING, 'Piece on e1 should be a King')
+        self.assertTrue(self.game.board.get_square('h1').piece_type == piece_types.ROOK, 'Piece on h1 should be a Rook')
+    
+    def testKingCannotCastleIntoCheck(self):
+        self.game.board.set_square_to_piece('h1', Rook(colors.WHITE))
+        self.game.board.set_square_to_piece('e1', King(colors.WHITE))
+        self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('e1')
+        self.game.board.set_square_to_piece('h8', Rook(colors.BLACK))
+        
+        self.assertFalse(self.game.rules.move_piece('e1', 'g1', self.game.board), 'King should not be able to castle into check')
+        self.assertTrue(self.game.board.get_square('e1').piece_type == piece_types.KING, 'Piece on e1 should be a King')
+        self.assertTrue(self.game.board.get_square('h1').piece_type == piece_types.ROOK, 'Piece on h1 should be a Rook')
+        
+    def testKingCannotMoveIntoCheck(self):
+        self.game.board.set_square_to_piece('e1', King(colors.WHITE))
+        self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('e1')
+        self.game.board.set_square_to_piece('f8', Rook(colors.BLACK))
+        
+        self.assertFalse(self.game.rules.move_piece('e1', 'f1', self.game.board), 'King should not be able to move into check')
+        
+    def testKingCanMoveWhenCheckIsBlockedByOwnPiece(self):
+        self.game.board.set_square_to_piece('e1', King(colors.WHITE))
+        self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('e1')
+        self.game.board.set_square_to_piece('f5', Pawn(colors.WHITE))
+        self.game.board.set_square_to_piece('f8', Rook(colors.BLACK))
+        
+        self.assertTrue(self.game.rules.move_piece('e1', 'f1', self.game.board), 'King should be able to move into area blocked')
+        
+    def testKingCanMoveWhenCheckIsBlockedByOtherPiece(self):
+        self.game.board.set_square_to_piece('e1', King(colors.WHITE))
+        self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('e1')
+        self.game.board.set_square_to_piece('f5', Pawn(colors.BLACK))
+        self.game.board.set_square_to_piece('f8', Rook(colors.BLACK))
+        
+        self.assertTrue(self.game.rules.move_piece('e1', 'f1', self.game.board), 'King should be able to move into area blocked')
+    
+    def testCannotMovePinnedPiece(self):
+        self.game.board.set_square_to_piece('f1', King(colors.WHITE))
+        self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('f1')
+        self.game.board.set_square_to_piece('f5', Bishop(colors.WHITE))
+        self.game.board.set_square_to_piece('f8', Rook(colors.BLACK))
+        
+        self.assertFalse(self.game.rules.move_piece('f5', 'e4', self.game.board), 'Bishop is pinned')
+    
+    def testKingMustMoveWhenInCheck(self):
+        self.game.board.set_square_to_piece('f1', King(colors.WHITE))
+        self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('f1')
+        self.game.board.set_square_to_piece('e5', Pawn(colors.WHITE))
+        self.game.board.set_square_to_piece('f8', Rook(colors.BLACK))
+        
+        self.assertFalse(self.game.rules.move_piece('e5', 'e6', self.game.board), 'King must move out of check')
+    
+    def testCanBlockCheckingPiece(self):
+        self.game.board.set_square_to_piece('f1', King(colors.WHITE))
+        self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('f1')
+        self.game.board.set_square_to_piece('e5', Rook(colors.WHITE))
+        self.game.board.set_square_to_piece('f8', Rook(colors.BLACK))
+        
+        self.assertTrue(self.game.rules.move_piece('e5', 'f5', self.game.board), 'Rook may block checking piece')
+        
+    def testCanTakeCheckingPiece(self):
+        self.game.board.set_square_to_piece('f1', King(colors.WHITE))
+        self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('f1')
+        self.game.board.set_square_to_piece('e8', Rook(colors.WHITE))
+        self.game.board.set_square_to_piece('f8', Rook(colors.BLACK))
+        
+        self.assertTrue(self.game.rules.move_piece('e8', 'f8', self.game.board), 'Rook may take checking piece')
+    
+    def testKingIsInCheckmate(self):
+        self.game.board.set_square_to_piece('f1', King(colors.WHITE))
+        self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('f1')
+        self.game.board.set_square_to_piece('h1', Rook(colors.BLACK))
+        self.game.board.set_square_to_piece('a2', Rook(colors.BLACK))
+        
+        self.assertTrue(self.game.is_checkmate(colors.WHITE), 'King cannot move, block, nor take out of check')
 
 if __name__ == "__main__":
     unittest.main()

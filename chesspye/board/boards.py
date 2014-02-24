@@ -4,7 +4,7 @@ Created on Jun 20, 2013
 @author: nick
 '''
 
-from pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors
+from pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors, piece_types
 from chesspye.utils import ctl, letter_to_number
 
 class Board(object):
@@ -14,6 +14,7 @@ class Board(object):
         self.height = height
         self.pretty_print = pretty_print
         self.pieces = {}
+        self.kings = {}
         self.clear_board()
     
     def __str__(self):
@@ -61,6 +62,8 @@ class Board(object):
         for i in range(self.height):
             for j in range(self.width):
                 self.pieces[(i,j)] = None
+        for i in self.kings.keys(): #explicit
+            self.kings[i] = None
                 
     def square_is_on_board(self, square):
         return square[0] < self.width and square[0] >= 0 and square[1] < self.height and square[1] >= 0
@@ -77,6 +80,9 @@ class Board(object):
         if self.square_is_on_board(square):
             return self.pieces[square]
         return None
+    
+    def get_king_location(self, color):
+        return self.kings[color]
     
     def piece_str(self, piece):
         if self.pretty_print:
@@ -107,4 +113,6 @@ class ClassicBoard(Board):
         for i in range(self.width):
             self.pieces[(1,i)] = Pawn(colors.WHITE)
             self.pieces[(6,i)] = Pawn(colors.BLACK)
+        self.kings[colors.BLACK] = (7,4)
+        self.kings[colors.WHITE] = (0,4)
         

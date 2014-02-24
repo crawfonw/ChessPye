@@ -18,6 +18,7 @@ Note on the move_rules dict:
 from chesspye.board.pieces import colors, move_types, piece_types
 from chesspye.utils import Vec2d
 
+from copy import deepcopy
 from math import copysign
 
 class Rules(object):
@@ -79,36 +80,48 @@ class VanillaRules(Rules):
                 if rule_applied is not None:
                     return rule_applied
                 
-            if self.piece_can_move_from_to(piece, from_sq, to_sq, board):
+            if self.is_valid_move(piece, from_sq, to_sq, board):
                 board.pieces[from_sq] = None
                 board.pieces[to_sq] = piece
                 
-                if piece.color == colors.WHITE:
-                    if piece.piece_type == piece_types.KING:
+                if piece.piece_type == piece_types.KING:
+                    board.kings[piece.color] = to_sq
+                    if piece.color == colors.WHITE:
                         self.game_variables['white_can_kingside_castle'] = False
                         self.game_variables['white_can_queenside_castle'] = False
-                    #Hard-coded
-                    #TODO: Un-hardcode rook locations for support for possible variants 
-                    elif piece.piece_type == piece_types.ROOK:
+                    elif piece.color == colors.BLACK:
+                        self.game_variables['black_can_kingside_castle'] = False
+                        self.game_variables['black_can_queenside_castle'] = False
+                #Hard-coded
+                #TODO: Un-hardcode rook locations for support for possible variants 
+                elif piece.piece_type == piece_types.ROOK:
+                    if piece.color == colors.WHITE:
                         if not piece.has_moved():
                             if from_sq == (0,7):
                                 self.game_variables['white_can_kingside_castle'] = False
                             elif from_sq == (0,0):
                                 self.game_variables['white_can_queenside_castle'] = False
-                elif piece.color == colors.BLACK:
-                    if piece.piece_type == piece_types.KING:
-                        self.game_variables['black_can_kingside_castle'] = False
-                        self.game_variables['black_can_queenside_castle'] = False
-                    elif piece.piece_type == piece_types.ROOK:
-                        if not piece.has_moved():
-                            if from_sq == (7,7):
-                                self.game_variables['black_can_kingside_castle'] = False
-                            elif from_sq == (7,0):
-                                self.game_variables['black_can_queenside_castle'] = False
+                        elif piece.color == colors.BLACK:
+                            if not piece.has_moved():
+                                if from_sq == (7,7):
+                                    self.game_variables['black_can_kingside_castle'] = False
+                                elif from_sq == (7,0):
+                                    self.game_variables['black_can_queenside_castle'] = False
                 
                 piece.times_moved += 1
                 return True
             
+        return False
+    
+    def is_valid_move(self, piece, from_sq, to_sq, board):
+        if piece.piece_type == piece_types.KING:
+            if self.is_square_guarded_by(to_sq, piece.color * -1, board):
+                return False
+        #TODO: need to verify that the king isn't in check AFTER we make the move
+        #must copy the board and test that way. Probably need to rename and move some
+        #methods since things are starting to reference one another a lot
+        if self.piece_can_move_from_to(piece, from_sq, to_sq, board) and not self.king_is_in_check(piece.color, board):
+            return True
         return False
     
     def piece_can_move_from_to(self, piece, from_sq, to_sq, board):
@@ -160,6 +173,22 @@ class VanillaRules(Rules):
                         curr_sq += dir_vec
                     return True
     
+    def is_square_guarded_by(self, square, color, board):
+        colored_pieces = []
+        for loc, piece in board.pieces.items():
+            if piece is not None:
+                if piece.color == color:
+                    colored_pieces.append((loc, piece))
+        for loc, piece in colored_pieces:
+            if self.piece_can_move_from_to(piece, loc, square, board):
+                return True
+        return False
+    
+    def king_is_in_check(self, color, board):
+        if board.kings[color] is None: #for testing or variants
+            return False
+        return self.is_square_guarded_by(board.kings[color], color * -1, board)
+
     def handle_en_passante(self, from_sq, to_sq, move_vector, piece, board, move_stack):
         if piece.piece_type == piece_types.PAWN and tuple(move_vector) in piece.attack_patterns():
             other = board.pieces[tuple(Vec2d(from_sq) + Vec2d(0, move_vector.y))]
