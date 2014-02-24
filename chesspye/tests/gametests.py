@@ -7,6 +7,7 @@ import unittest
 
 from chesspye.game.games import VanillaChess
 from chesspye.board.pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors, piece_types
+from chesspye.utils import Stack
 
 class TestPieceMovement(unittest.TestCase):
 
@@ -88,28 +89,95 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.pieces[(2,3)] = Pawn(colors.WHITE)
         
         self.assertFalse(self.game.rules.move_piece((1,3), (3,3), self.game.board), 'Pawn is blocked')
+
+    def testCannotAttackEmptySquare(self):
+        self.game.board.set_square_to_piece('e5', Pawn(colors.WHITE))
+        self.assertFalse(self.game.rules.move_piece('e5', 'd6', self.game.board), 'Pawn cannot attack empty square')
+        self.assertFalse(self.game.rules.move_piece('e5', 'f6', self.game.board), 'Pawn cannot attack empty square')
         
-    def testEnPassentToLeft(self):
-        self.skipTest('Not implemented')
+    def testWhiteEnPassentToLeft(self):
+        black_pawn = Pawn(colors.BLACK)
+        black_pawn.times_moved = 1
+        moves = Stack([(black_pawn, None, None)]) #The squares shouldn't matter
         
-    def testEnPassentToRight(self):
-        self.skipTest('Not implemented')
+        self.game.board.set_square_to_piece('e5', Pawn(colors.WHITE))
+        self.game.board.set_square_to_piece('d5', black_pawn)
+        
+        self.assertTrue(self.game.rules.move_piece('e5', 'd6', self.game.board, moves), 'Pawn should be able to en passante to left')
+        
+    def testWhiteEnPassentToRight(self):
+        black_pawn = Pawn(colors.BLACK)
+        black_pawn.times_moved = 1
+        moves = Stack([(black_pawn, None, None)])
+        
+        self.game.board.set_square_to_piece('e5', Pawn(colors.WHITE))
+        self.game.board.set_square_to_piece('f5', black_pawn)
+        
+        self.assertTrue(self.game.rules.move_piece('e5', 'f6', self.game.board, moves), 'Pawn should be able to en passante to right')
+        
+    def testBlackEnPassentToLeft(self):
+        white_pawn = Pawn(colors.WHITE)
+        white_pawn.times_moved = 1
+        moves = Stack([(white_pawn, None, None)])
+        
+        self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
+        self.game.board.set_square_to_piece('d4', white_pawn)
+        
+        self.assertTrue(self.game.rules.move_piece('e4', 'd3', self.game.board, moves), 'Pawn should be able to en passante to left')
+        
+    def testBlackEnPassentToRight(self):
+        white_pawn = Pawn(colors.WHITE)
+        white_pawn.times_moved = 1
+        moves = Stack([(white_pawn, None, None)])
+        
+        self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
+        self.game.board.set_square_to_piece('f4', white_pawn)
+        
+        self.assertTrue(self.game.rules.move_piece('e4', 'f3', self.game.board, moves), 'Pawn should be able to en passante to right')
         
     def testCannotEnPassentAfterMoreThanOneTurn(self):
-        self.skipTest('Not implemented')
+        other_piece = Rook(colors.WHITE)
+        white_pawn = Pawn(colors.WHITE)
+        white_pawn.times_moved = 1
+        moves = Stack([(white_pawn, None, None)])
+        moves.push((other_piece, None, None))
+        
+        self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
+        self.game.board.set_square_to_piece('f4', white_pawn)
+        
+        self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board, moves), 'Pawn cannot en passante after two turns')
         
     def testCannotEnPassentPawnThatHasMovedTwoSpacesOneAtATime(self):
-        self.skipTest('Not implemented')
+        white_pawn = Pawn(colors.WHITE)
+        white_pawn.times_moved = 2
+        moves = Stack([(white_pawn, None, None)])
+        
+        self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
+        self.game.board.set_square_to_piece('f4', white_pawn)
+        
+        self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board, moves), 'Pawn cannot en passante after two moves')
         
     def testCannotEnPassentNonPawn(self):
-        self.skipTest('Not implemented')
+        white_rook = Rook(colors.WHITE)
+        white_rook.times_moved = 1
+        moves = Stack([(white_rook, None, None)])
+        
+        self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
+        self.game.board.set_square_to_piece('f4', white_rook)
+        
+        self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board, moves), 'Pawn cannot en passante a non-pawn')
         
     def testCannotEnPassentOwnPiece(self):
-        self.skipTest('Not implemented')
+        #Would this even happen?
+        white_pawn = Pawn(colors.BLACK)
+        white_pawn.times_moved = 1
+        moves = Stack([(white_pawn, None, None)])
         
-    def testCannotAttackEmptySquare(self):
-        self.skipTest('Not implemented')
+        self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
+        self.game.board.set_square_to_piece('f4', white_pawn)
         
+        self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board, moves), 'Pawn cannot en passante own pawn')
+
     def testKnightCanJump(self):
         self.game.board.pieces[(3,3)] = Knight(colors.WHITE)
         self.game.board.pieces[(2,3)] = Pawn(colors.WHITE)

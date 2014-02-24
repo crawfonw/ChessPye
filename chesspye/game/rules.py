@@ -4,11 +4,12 @@ Created on Feb 22, 2014
 @author: Nick Crawford
 
 Note on the move_rules dict:
-    Each rule method must consume (from_sq, to_sq, move_vector, piece, board).
-    piece - instance of a Piece
-    from_sq, to_sq - each a tuple of coordinates of starting and ending pos
-    board - the current board state of the game
-    move_vector - computed via from_sq and to_sq in main move handling method
+    Each rule method must consume (from_sq, to_sq, move_vector, piece, board, move_stack):
+        piece - instance of a Piece
+        from_sq, to_sq - each a tuple of coordinates of starting and ending pos
+        move_vector - computed via from_sq and to_sq in main move handling method
+        board - the current board state of the game
+        move_stack - Stack obj containing all the previous moves
     
     If more rules are added (i.e. for variants) they must be in the extended
     rules class if you want them to interact with game_variables (duh)
@@ -48,23 +49,23 @@ class VanillaRules(Rules):
         self.register_move_rule(self.handle_castle, 'castle')
         
         
-    def move_piece(self, from_sq, to_sq, board):
+    def move_piece(self, from_sq, to_sq, board, move_stack=None): #move_stack=None for test methods (aka laziness)
         if type(from_sq) == type(to_sq):
             if type(from_sq) == tuple:
-                return self.move_piece_coordinate(from_sq, to_sq, board)
+                return self.move_piece_coordinate(from_sq, to_sq, board, move_stack)
             elif type(from_sq) == str:
-                return self.move_piece_algebraic(from_sq, to_sq, board)
+                return self.move_piece_algebraic(from_sq, to_sq, board, move_stack)
             else:
                 raise TypeError("Invalid square specification data type %s" % type(from_sq))
         else:
             raise TypeError("from_sq and to_sq datatypes must match! (Inputs were %s and %s.)" % (type(from_sq), type(to_sq)))
     
-    def move_piece_algebraic(self, from_sq, to_sq, board):
+    def move_piece_algebraic(self, from_sq, to_sq, board, move_stack):
         #i.e. d1-d4 not Qd4
         return self.move_piece_coordinate(board.algebraic_to_coordinate_square(from_sq), \
-                          board.algebraic_to_coordinate_square(to_sq), board)
+                          board.algebraic_to_coordinate_square(to_sq), board, move_stack)
 
-    def move_piece_coordinate(self, from_sq, to_sq, board):
+    def move_piece_coordinate(self, from_sq, to_sq, board, move_stack):
         if from_sq == to_sq:
             return False
         if not board.square_is_on_board(from_sq):
@@ -73,8 +74,8 @@ class VanillaRules(Rules):
         if piece is not None:
             move_vector = Vec2d(to_sq) - Vec2d(from_sq)
             
-            for name,rule in self.move_rules.items():
-                rule_applied = rule(from_sq, to_sq, move_vector, piece, board) 
+            for name, rule in self.move_rules.items():
+                rule_applied = rule(from_sq, to_sq, move_vector, piece, board, move_stack) 
                 if rule_applied is not None:
                     return rule_applied
                 
@@ -158,17 +159,20 @@ class VanillaRules(Rules):
                             return False
                         curr_sq += dir_vec
                     return True
-                
-    def handle_en_passante(self, from_sq, to_sq, move_vector, piece, board):
-        if piece.piece_type == piece_types.PAWN and move_vector.get_length_sqrd() == 2:
-            if move_vector == Vec2d(1, 1):
-                other_piece = board.pieces[tuple(Vec2d(from_sq) + Vec2d(0, 1))]
-                if other_piece is not None and other_piece.piece_type == piece_types.PAWN:
-                    return 
-            elif move_vector == Vec2d(1, -1):
-                return
+    
+    def handle_en_passante(self, from_sq, to_sq, move_vector, piece, board, move_stack):
+        if piece.piece_type == piece_types.PAWN and tuple(move_vector) in piece.attack_patterns():
+            other = board.pieces[tuple(Vec2d(from_sq) + Vec2d(0, move_vector.y))]
+            if other is not None and other.piece_type == piece_types.PAWN and other.color != piece.color:
+                last_move = move_stack.peek()
+                if other is last_move[0] and other.times_moved == 1: #Want the same exact piece (in memory)
+                    board.pieces[from_sq] = None
+                    board.pieces[to_sq] = piece
+                    piece.times_moved += 1
+                    return True
+                return False
             
-    def handle_castle(self, from_sq, to_sq, move_vector, piece, board):
+    def handle_castle(self, from_sq, to_sq, move_vector, piece, board, move_stack):
         if piece.piece_type == piece_types.KING and move_vector.get_length() == 2:
             if piece.has_moved():
                 return False
