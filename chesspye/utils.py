@@ -41,7 +41,8 @@ class Stack(object):
         return self.objs.pop()
     
     def peek(self):
-        return self.objs[-1]
+        if not self.is_empty():
+            return self.objs[-1]
         
     def is_empty(self):
         return len(self.objs) == 0

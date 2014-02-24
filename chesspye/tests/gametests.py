@@ -103,7 +103,7 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.set_square_to_piece('e5', Pawn(colors.WHITE))
         self.game.board.set_square_to_piece('d5', black_pawn)
         
-        self.assertTrue(self.game.rules.move_piece('e5', 'd6', self.game.board, moves), 'Pawn should be able to en passante to left')
+        self.assertTrue(self.game.rules.move_piece('e5', 'd6', self.game.board), 'Pawn should be able to en passante to left')
         
     def testWhiteEnPassentToRight(self):
         black_pawn = Pawn(colors.BLACK)
@@ -113,7 +113,7 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.set_square_to_piece('e5', Pawn(colors.WHITE))
         self.game.board.set_square_to_piece('f5', black_pawn)
         
-        self.assertTrue(self.game.rules.move_piece('e5', 'f6', self.game.board, moves), 'Pawn should be able to en passante to right')
+        self.assertTrue(self.game.rules.move_piece('e5', 'f6', self.game.board), 'Pawn should be able to en passante to right')
         
     def testBlackEnPassentToLeft(self):
         white_pawn = Pawn(colors.WHITE)
@@ -123,7 +123,7 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
         self.game.board.set_square_to_piece('d4', white_pawn)
         
-        self.assertTrue(self.game.rules.move_piece('e4', 'd3', self.game.board, moves), 'Pawn should be able to en passante to left')
+        self.assertTrue(self.game.rules.move_piece('e4', 'd3', self.game.board), 'Pawn should be able to en passante to left')
         
     def testBlackEnPassentToRight(self):
         white_pawn = Pawn(colors.WHITE)
@@ -133,7 +133,7 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
         self.game.board.set_square_to_piece('f4', white_pawn)
         
-        self.assertTrue(self.game.rules.move_piece('e4', 'f3', self.game.board, moves), 'Pawn should be able to en passante to right')
+        self.assertTrue(self.game.rules.move_piece('e4', 'f3', self.game.board), 'Pawn should be able to en passante to right')
         
     def testCannotEnPassentAfterMoreThanOneTurn(self):
         other_piece = Rook(colors.WHITE)
@@ -145,7 +145,7 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
         self.game.board.set_square_to_piece('f4', white_pawn)
         
-        self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board, moves), 'Pawn cannot en passante after two turns')
+        self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board), 'Pawn cannot en passante after two turns')
         
     def testCannotEnPassentPawnThatHasMovedTwoSpacesOneAtATime(self):
         white_pawn = Pawn(colors.WHITE)
@@ -155,7 +155,7 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
         self.game.board.set_square_to_piece('f4', white_pawn)
         
-        self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board, moves), 'Pawn cannot en passante after two moves')
+        self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board), 'Pawn cannot en passante after two moves')
         
     def testCannotEnPassentNonPawn(self):
         white_rook = Rook(colors.WHITE)
@@ -165,7 +165,7 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
         self.game.board.set_square_to_piece('f4', white_rook)
         
-        self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board, moves), 'Pawn cannot en passante a non-pawn')
+        self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board), 'Pawn cannot en passante a non-pawn')
         
     def testCannotEnPassentOwnPiece(self):
         #Would this even happen?
@@ -176,7 +176,7 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
         self.game.board.set_square_to_piece('f4', white_pawn)
         
-        self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board, moves), 'Pawn cannot en passante own pawn')
+        self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board), 'Pawn cannot en passante own pawn')
 
     def testKnightCanJump(self):
         self.game.board.pieces[(3,3)] = Knight(colors.WHITE)

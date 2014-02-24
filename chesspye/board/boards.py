@@ -83,9 +83,6 @@ class Board(object):
             return self.pieces[square]
         return None
     
-    def get_king_location(self, color):
-        return self.kings[color]
-    
     def piece_str(self, piece):
         if self.pretty_print:
             return unicode(piece)
