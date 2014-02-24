@@ -86,18 +86,18 @@ class TestBoardCreation(unittest.TestCase):
         self.assertEqual(colors.BLACK, self.cboard.pieces[(7,5)].color, '%s is not of color BLACK' % repr(self.cboard.pieces[(7,5)]))
     
     def testBoardDoesHaveKingsInCorrectPosition(self):
-        self.assertTrue(isinstance(self.cboard.pieces[(0,3)], King), '%s is not of type King')
-        self.assertEqual(colors.WHITE, self.cboard.pieces[(0,3)].color, '%s is not of color WHITE' % repr(self.cboard.pieces[(0,3)]))
+        self.assertTrue(isinstance(self.cboard.pieces[(0,4)], King), '%s is not of type King')
+        self.assertEqual(colors.WHITE, self.cboard.pieces[(0,4)].color, '%s is not of color WHITE' % repr(self.cboard.pieces[(0,3)]))
         
-        self.assertTrue(isinstance(self.cboard.pieces[(7,3)], King), '%s is not of type King')
-        self.assertEqual(colors.BLACK, self.cboard.pieces[(7,3)].color, '%s is not of color BLACK' % repr(self.cboard.pieces[(7,3)]))
+        self.assertTrue(isinstance(self.cboard.pieces[(7,4)], King), '%s is not of type King')
+        self.assertEqual(colors.BLACK, self.cboard.pieces[(7,4)].color, '%s is not of color BLACK' % repr(self.cboard.pieces[(7,3)]))
     
     def testBoardDoesHaveQueensInCorrectPosition(self):
-        self.assertTrue(isinstance(self.cboard.pieces[(0,4)], Queen), '%s is not of type Queen')
-        self.assertEqual(colors.WHITE, self.cboard.pieces[(0,4)].color, '%s is not of color WHITE' % repr(self.cboard.pieces[(0,4)]))
+        self.assertTrue(isinstance(self.cboard.pieces[(0,3)], Queen), '%s is not of type Queen')
+        self.assertEqual(colors.WHITE, self.cboard.pieces[(0,3)].color, '%s is not of color WHITE' % repr(self.cboard.pieces[(0,4)]))
         
-        self.assertTrue(isinstance(self.cboard.pieces[(7,4)], Queen), '%s is not of type Queen')
-        self.assertEqual(colors.BLACK, self.cboard.pieces[(7,4)].color, '%s is not of color BLACK' % repr(self.cboard.pieces[(7,4)]))
+        self.assertTrue(isinstance(self.cboard.pieces[(7,3)], Queen), '%s is not of type Queen')
+        self.assertEqual(colors.BLACK, self.cboard.pieces[(7,3)].color, '%s is not of color BLACK' % repr(self.cboard.pieces[(7,4)]))
 
 class TestCoordinateToAlgebraicConversions(unittest.TestCase):
     
@@ -134,7 +134,7 @@ class TestCoordinateToAlgebraicConversions(unittest.TestCase):
         self.assertEqual(correct_move, converted_move, 'Move notation %s should be %s' % (converted_move, correct_move))
     
     def testConvertCoordinateToAlgebraicMoveOnlyPawn(self):
-        self.fail('Not implemented')
+        self.skipTest('Not implemented')
     
     def testConvertCoordinateToAlgebraicWithCapture(self):
         self.board.pieces[(0,7)] = Rook(colors.WHITE)
@@ -148,19 +148,19 @@ class TestCoordinateToAlgebraicConversions(unittest.TestCase):
         self.assertEqual(correct_move, converted_move, 'Move notation %s should be %s' % (converted_move, correct_move))
         
     def testConvertCoordinateToAlgebraicWithCapturePawn(self):
-        self.fail('Not implemented')
+        self.skipTest('Not implemented')
     
     def testConvertCoordinateToAlgebraicWithAmbiguousMove(self):
-        self.fail('Not implemented')
+        self.skipTest('Not implemented')
     
     def testConvertCoordinateToAlgebraicWithAmbiguousCapture(self):
-        self.fail('Not implemented')
+        self.skipTest('Not implemented')
         
     def testConvertCoordinateToAlgebraicEnPassant(self):
-        self.fail('Not implemented')
+        self.skipTest('Not implemented')
         
     def testConvertCoordinateToAlgebraicPawnPromotion(self):
-        self.fail('Not implemented') 
+        self.skipTest('Not implemented') 
 
 if __name__ == "__main__":
     unittest.main()
