@@ -1550,7 +1550,7 @@ class TestCheckmateRules(unittest.TestCase):
     def tearDown(self):
         pass
     
-    def testWhiteCheckmateWithNoOtherPieces(self):
+    def testWhiteIsCheckmatedWithNoOtherPieces(self):
         self.board.set_square_to_piece('a1', King(colors.WHITE))
         self.board.set_square_to_piece('f2', Rook(colors.BLACK))
         self.board.set_square_to_piece('b8', Rook(colors.BLACK))
@@ -1558,6 +1558,82 @@ class TestCheckmateRules(unittest.TestCase):
         self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
         
         self.assertTrue(self.rules.is_checkmate(colors.WHITE, self.board), 'White is checkmated')
+        
+    def testWhiteIsCheckmatedWithOwnPiecesBlocking(self):
+        self.board.set_square_to_piece('g1', King(colors.WHITE))
+        self.board.set_square_to_piece('f2', Pawn(colors.WHITE))
+        self.board.set_square_to_piece('g2', Pawn(colors.WHITE))
+        self.board.set_square_to_piece('h2', Pawn(colors.WHITE))
+        self.board.set_square_to_piece('a1', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('g1')
+        
+        self.assertTrue(self.rules.is_checkmate(colors.WHITE, self.board), 'White is checkmated')
+        
+    def testWhiteIsCheckmatedWithPinnedAndGuardedPiece(self):
+        self.board.set_square_to_piece('a1', King(colors.WHITE))
+        self.board.set_square_to_piece('a2', Rook(colors.WHITE))
+        self.board.set_square_to_piece('b2', Queen(colors.BLACK))
+        self.board.set_square_to_piece('a8', Rook(colors.BLACK))
+        self.board.set_square_to_piece('b3', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertTrue(self.rules.is_checkmate(colors.WHITE, self.board), 'White is checkmated')
+        
+    def testWhiteCanBlockCheckmate(self):
+        self.board.set_square_to_piece('b1', King(colors.WHITE))
+        self.board.set_square_to_piece('c5', Rook(colors.WHITE))
+        self.board.set_square_to_piece('g1', Rook(colors.BLACK))
+        self.board.set_square_to_piece('f2', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('b1')
+        
+        self.assertFalse(self.rules.is_checkmate(colors.WHITE, self.board), 'White can block with rook')
+        
+    def testWhiteCanTakeCheckmate(self):
+        self.board.set_square_to_piece('b1', King(colors.WHITE))
+        self.board.set_square_to_piece('g5', Rook(colors.WHITE))
+        self.board.set_square_to_piece('g1', Rook(colors.BLACK))
+        self.board.set_square_to_piece('f2', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('b1')
+        
+        self.assertFalse(self.rules.is_checkmate(colors.WHITE, self.board), 'White can take with rook')
+        
+    def testWhiteCannotBlockKnightCheckmate(self):
+        self.board.set_square_to_piece('a1', King(colors.WHITE))
+        self.board.set_square_to_piece('a5', Rook(colors.WHITE))
+        self.board.set_square_to_piece('b3', Knight(colors.BLACK))
+        self.board.set_square_to_piece('d3', Bishop(colors.BLACK))
+        self.board.set_square_to_piece('e2', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertTrue(self.rules.is_checkmate(colors.WHITE, self.board), 'White cannot move nor block')
+        
+    def testWhiteCanTakeKnightCheckmate(self):
+        self.board.set_square_to_piece('a1', King(colors.WHITE))
+        self.board.set_square_to_piece('b5', Rook(colors.WHITE))
+        self.board.set_square_to_piece('b3', Knight(colors.BLACK))
+        self.board.set_square_to_piece('d3', Bishop(colors.BLACK))
+        self.board.set_square_to_piece('e2', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertTrue(self.rules.is_checkmate(colors.WHITE, self.board), 'White cannot move nor block')
+        
+    def testKingCanTakeOutOfCheckmate(self):
+        self.board.set_square_to_piece('c1', King(colors.WHITE))
+        self.board.set_square_to_piece('d1', Rook(colors.BLACK))
+        self.board.set_square_to_piece('h2', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertFalse(self.rules.is_checkmate(colors.WHITE, self.board), 'White cannot move nor block')
+        
+    def testCannotBlockMultipleCheckingPieces(self):
+        self.board.set_square_to_piece('c3', King(colors.WHITE))
+        self.board.set_square_to_piece('b8', Rook(colors.WHITE))
+        self.board.set_square_to_piece('g1', Rook(colors.WHITE))
+        self.board.set_square_to_piece('a3', Rook(colors.BLACK))
+        self.board.set_square_to_piece('h3', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertFalse(self.rules.can_a_piece_block_or_take_check(colors.WHITE, self.board), 'White cannot block with either rook')
     
 if __name__ == "__main__":
     unittest.main()

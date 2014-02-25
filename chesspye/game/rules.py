@@ -181,13 +181,14 @@ class VanillaRules(Rules):
         valid_squares = []
         if piece.move_type == move_types.MAX and not piece.can_jump:
             curr_square = tuple(Vec2d(from_sq) + av)
-            while True: 
+            while True:
                 if not board.square_is_on_board(curr_square):
                     break
-                if board[curr_square] is not None: #since we check for jumper already
+                if board.pieces[curr_square] is not None: #since we check for jumper already
                     valid_squares.append(curr_square)
                     break
                 valid_squares.append(curr_square)
+                curr_square = tuple(Vec2d(curr_square) + av)
         else:
             for move in piece.attack_patterns():
                 curr_square = tuple(Vec2d(from_sq) + av)
