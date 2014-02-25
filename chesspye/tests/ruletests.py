@@ -1141,6 +1141,22 @@ class TestCheckRules(unittest.TestCase):
         
         self.assertFalse(self.rules.move_piece('f5', 'e4', self.board), 'Bishop is pinned')
         
+    def testWhiteCannotMovePinnedRook(self):
+        self.board.set_square_to_piece('e2', Rook(colors.WHITE))
+        self.board.set_square_to_piece('e1', King(colors.WHITE))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('e1')
+        self.board.set_square_to_piece('e8', Rook(colors.BLACK))
+        
+        self.assertFalse(self.rules.move_piece('e2', 'b2', self.board), 'Rook is pinned')
+        
+    def testBlackCannotMovePinnedRook(self):
+        self.board.set_square_to_piece('e2', Rook(colors.BLACK))
+        self.board.set_square_to_piece('e1', King(colors.BLACK))
+        self.board.kings[colors.BLACK] = self.board.algebraic_to_coordinate_square('e1')
+        self.board.set_square_to_piece('e8', Rook(colors.WHITE))
+        
+        self.assertFalse(self.rules.move_piece('e2', 'b2', self.board), 'Rook is pinned')
+        
     def testWhiteCannotEnPassanteIntoCheck(self):
         black_pawn = Pawn(colors.BLACK, times_moved=1)
         self.board.moves.push((black_pawn, None, None))
@@ -1228,6 +1244,118 @@ class TestCheckRules(unittest.TestCase):
         self.board.set_square_to_piece('f8', Rook(colors.WHITE))
         
         self.assertTrue(self.rules.move_piece('e8', 'f8', self.board), 'Rook may take checking piece')
+
+class TestFiftyMoveRule(unittest.TestCase):
+
+    def setUp(self):
+        self.rules = VanillaRules()
+        self.board = ClassicBoard()
+        self.board.clear_board()
+
+    def tearDown(self):
+        pass
+    
+    def testMoveCounterIncrementedOnGeneralMove(self):
+        self.board.set_square_to_piece('a1', Rook(colors.WHITE))
+        self.board.set_square_to_piece('h8', Rook(colors.BLACK))
+        
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Fifty move counter should be 0')
+        
+        self.rules.move_piece('a1', 'b1', self.board)
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 1, 'Fifty move counter should be 1')
+        self.rules.move_piece('h8', 'h7', self.board)
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 2, 'Fifty move counter should be 2')
+        self.rules.move_piece('b1', 'b8', self.board)
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 3, 'Fifty move counter should be 3')
+    
+    def testMoveCounterIncrementedOnCastle(self):
+        self.board.set_square_to_piece('h1', Rook(colors.WHITE))
+        self.board.set_square_to_piece('e1', King(colors.WHITE))
+        self.board.set_square_to_piece('a8', Rook(colors.BLACK))
+        self.board.set_square_to_piece('e8', King(colors.BLACK))
+        
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Fifty move counter should be 0')
+        
+        self.rules.move_piece('e1', 'g1', self.board)
+        self.rules.move_piece('e8', 'c8', self.board)
+        
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 2, 'Fifty move counter should be 2')
+        
+    
+    def testMoveCounterDoesGetResetOnCapture(self):
+        self.board.set_square_to_piece('a1', Rook(colors.WHITE))
+        self.board.set_square_to_piece('h8', Rook(colors.BLACK))
+        
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Fifty move counter should be 0')
+        
+        self.rules.move_piece('a1', 'a8', self.board)
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 1, 'Fifty move counter should be 1')
+        self.rules.move_piece('h8', 'a8', self.board)
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Fifty move counter should be 0')
+    
+    def testMoveCounterDoesGetResetOnPawnMove(self):
+        self.board.set_square_to_piece('a1', Rook(colors.WHITE))
+        self.board.set_square_to_piece('h8', Rook(colors.BLACK))
+        self.board.set_square_to_piece('e7', Pawn(colors.BLACK))
+        
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Fifty move counter should be 0')
+        
+        self.rules.move_piece('a1', 'b1', self.board)
+        self.rules.move_piece('h8', 'h7', self.board)
+        self.rules.move_piece('a1', 'b8', self.board)
+        self.rules.move_piece('e7', 'e5', self.board)
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Fifty move counter should be 0')
+        
+    def testMoveCounterDoesNotResetOnNormalPieceMove(self):
+        self.board.set_square_to_piece('a1', Rook(colors.WHITE))
+        self.board.set_square_to_piece('b1', Knight(colors.WHITE))
+        self.board.set_square_to_piece('c1', Bishop(colors.WHITE))
+        self.board.set_square_to_piece('d1', Queen(colors.WHITE))
+        self.board.set_square_to_piece('e1', King(colors.WHITE))
+        
+        self.rules.move_piece('a1', 'a2', self.board)
+        self.assertNotEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Counter should not be zero')
+        self.rules.move_piece('b1', 'c3', self.board)
+        self.assertNotEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Counter should not be zero')
+        self.rules.move_piece('c1', 'b2', self.board)
+        self.assertNotEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Counter should not be zero')
+        self.rules.move_piece('d1', 'd8', self.board)
+        self.assertNotEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Counter should not be zero')
+        self.rules.move_piece('e1', 'f1', self.board)
+        self.assertNotEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Counter should not be zero')
+        
+    def testInvalidMoveDoesNotIncrementCount(self):
+        self.board.set_square_to_piece('a1', Rook(colors.WHITE))
+        
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Counter should be zero')
+        self.rules.move_piece('a1', 'b2', self.board)
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Counter should be zero')
+    
+    def testInvalidMoveThroughCheckDoesNotIncrementCount(self):
+        self.board.set_square_to_piece('e1', King(colors.WHITE))
+        self.board.set_square_to_piece('d8', Rook(colors.BLACK))
+        
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Counter should be zero')
+        self.rules.move_piece('e1', 'd1', self.board)
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Counter should be zero')
+    
+    def testInvalidMoveThroughPinnedPieceDoesNotIncrementCount(self):
+        self.board.set_square_to_piece('e2', Rook(colors.WHITE))
+        self.board.set_square_to_piece('e1', King(colors.WHITE))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('e1')
+        self.board.set_square_to_piece('e8', Rook(colors.BLACK))
+        
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Counter should be zero')
+        self.rules.move_piece('e2', 'b2', self.board)
+        self.assertEqual(self.rules.game_variables['fifty_move_counter'], 0, 'Counter should be zero')
+    
+    def testDrawDetectionByFiftyMove(self):
+        self.board.set_square_to_piece('a1', Rook(colors.WHITE))
+        self.rules.game_variables['fifty_move_counter'] = 99
+        
+        self.assertFalse(self.rules.is_fifty_move(), 'Should not be a draw')
+        self.rules.move_piece('a1', 'a2', self.board)
+        self.assertTrue(self.rules.is_fifty_move(), 'Should be a draw')
 
 class TestMiscellaneosuRules(unittest.TestCase):
 
