@@ -66,6 +66,13 @@ class Board(object):
         for i in self.kings.keys(): #explicit
             self.kings[i] = None
         self.moves.objs = []
+        
+    def get_pieces_for_color(self, color): #(loc, piece)
+        pieces = []
+        for square, piece in self.pieces.items():
+            if piece is not None and piece.color == color:
+                pieces.append((square, piece))
+        return pieces
                 
     def square_is_on_board(self, square):
         return square[0] < self.width and square[0] >= 0 and square[1] < self.height and square[1] >= 0

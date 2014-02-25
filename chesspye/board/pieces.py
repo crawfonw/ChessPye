@@ -47,6 +47,9 @@ class ChessPiece(object):
     def attack_patterns(self):
         return
     
+    def all_patterns(self):
+        return set(self.move_patterns()).union(set(self.attack_patterns()))
+    
     def has_moved(self):
         return self.times_moved > 0
 

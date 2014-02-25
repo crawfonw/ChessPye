@@ -95,31 +95,59 @@ class VanillaRules(Rules):
             return False
     
     #Endgame checks, called from game object
-    def is_game_over(self, color): #color: is this color check/stalemated?
-        pass
+    def is_game_over(self, color, board): #color: is this color check/stalemated?
+        if self.is_fifty_move() or self.is_threefold_repeition() or self.is_stalemate(color, board):
+            return 'stale'
+        elif self.is_checkmate(color, board):
+            return 'mate'
+        else:
+            return ''
     
-    def is_stalemate(self):
-        pass
+    def is_stalemate(self, color, board):
+        loc = board.kings[color]
+        king = board.pieces[loc]
+
+        for move in king.attack_patterns(): #maybe use all_patterns() to support variants with odd pieces
+            square = tuple(Vec2d(loc) + Vec2d(move))
+            if self.is_valid_move(loc, square, board):
+                return False
+        
+        for loc, piece in board.get_pieces_for_color(color):
+            for move in piece.all_patterns():
+                square = tuple(Vec2d(loc) + Vec2d(move))
+                if self.is_valid_move(loc, square, board):
+                    return False
+                
+        return True
     
-    def is_checkmate(self):
-        pass
+    
+    def is_checkmate(self, color, board):
+        '''
+        1. Check if king can move, if so then we're done
+        2. If not, for each pieces of 'color' determine what squares it could
+            move to on an empty board, then check if each of those is a valid
+            move in the current position
+        2b. If we could know which piece(s) is(are) checking then this would
+            require less calculations. Maybe check if the opposite color could
+            move to the current color's king's square. Then generate all possible
+            moves for those pieces on that given vector and see if any of the
+            current color's pieces can move to those squares or capture.
+        '''
+        #return self.is_stalemate() and self.is_king_in_check(color, board)
     
     def is_fifty_move(self):
         return self.game_variables['fifty_move_counter'] >= 100
     
-    def is_threefold_repeition(self):
+    def is_threefold_repeition(self): #might need to do some fun hash stuff here
         pass
     
     #Movement/board state validators
     def is_valid_move(self, from_sq, to_sq, board):
         if from_sq == to_sq:
             return None
-        if not board.square_is_on_board(from_sq):
+        if not board.square_is_on_board(from_sq) or \
+            not board.square_is_on_board(to_sq):
             return None
-        
-        #if piece.piece_type == piece_types.KING:
-        #    if self.is_square_guarded_by(to_sq, piece.color * -1, board):
-        #        return False
         
         piece = board.pieces[from_sq]
         if piece is not None:
@@ -135,7 +163,7 @@ class VanillaRules(Rules):
             move_count = self.game_variables['fifty_move_counter'] 
             self.do_move(rule_to_apply['name'], rule_to_apply, board_copy)
             self.game_variables['fifty_move_counter'] = move_count
-            if self.king_is_in_check(piece.color, board_copy):
+            if self.is_king_in_check(piece.color, board_copy):
                 del board_copy
                 return None
             
@@ -155,7 +183,7 @@ class VanillaRules(Rules):
                 return True
         return False
     
-    def king_is_in_check(self, color, board):
+    def is_king_in_check(self, color, board):
         if board.kings[color] is None: #for testing or variants
             return False
         return self.is_square_guarded_by(board.kings[color], color * -1, board)
@@ -173,7 +201,7 @@ class VanillaRules(Rules):
             pattern_types = piece.move_patterns()
         
         if piece.move_type == move_types.EXACT:
-            #The following logic might not work for weird moving piece_types
+            #The following logic might not work for weird moving pieces
             #(i.e. Knight) if they cannot jump
             #TODO: verify/fix this
             for move in pattern_types:

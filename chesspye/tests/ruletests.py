@@ -1357,7 +1357,7 @@ class TestFiftyMoveRule(unittest.TestCase):
         self.rules.move_piece('a1', 'a2', self.board)
         self.assertTrue(self.rules.is_fifty_move(), 'Should be a draw')
 
-class TestMiscellaneosuRules(unittest.TestCase):
+class TestMiscellaneousRules(unittest.TestCase):
 
     def setUp(self):
         self.rules = VanillaRules()
@@ -1451,5 +1451,113 @@ class TestMiscellaneosuRules(unittest.TestCase):
         self.assertEqual(self.board.kings[colors.BLACK], self.board.algebraic_to_coordinate_square('c8'), 'White king location not be set to c8')
         self.assertTrue(self.board.kings[colors.WHITE] is None, 'White king location should not be set')
         
+class TestStalemateRules(unittest.TestCase):
+
+    def setUp(self):
+        self.rules = VanillaRules()
+        self.board = ClassicBoard()
+        self.board.clear_board()
+
+    def tearDown(self):
+        pass
+    
+    def testWhiteStalemateWithNoOtherPieces(self):
+        self.board.set_square_to_piece('a1', King(colors.WHITE))
+        self.board.set_square_to_piece('f2', Rook(colors.BLACK))
+        self.board.set_square_to_piece('b8', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertTrue(self.rules.is_stalemate(colors.WHITE, self.board), 'White is stalemated')
+        
+    def testBlackStalemateWithNoOtherPieces(self):
+        self.board.set_square_to_piece('a1', King(colors.BLACK))
+        self.board.set_square_to_piece('f2', Rook(colors.WHITE))
+        self.board.set_square_to_piece('b8', Rook(colors.WHITE))
+        self.board.kings[colors.BLACK] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertTrue(self.rules.is_stalemate(colors.BLACK, self.board), 'Black is stalemated')
+        
+    def testWhiteStalemateWithBlockedPawns(self):
+        self.board.set_square_to_piece('a1', King(colors.WHITE))
+        self.board.set_square_to_piece('c3', Pawn(colors.WHITE))
+        self.board.set_square_to_piece('c4', Pawn(colors.BLACK))
+        self.board.set_square_to_piece('f2', Rook(colors.BLACK))
+        self.board.set_square_to_piece('b8', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertTrue(self.rules.is_stalemate(colors.WHITE, self.board), 'White is stalemated')
+        
+    def testBlackStalemateWithBlockedPawns(self):
+        self.board.set_square_to_piece('a1', King(colors.BLACK))
+        self.board.set_square_to_piece('c4', Pawn(colors.BLACK))
+        self.board.set_square_to_piece('c3', Pawn(colors.WHITE))
+        self.board.set_square_to_piece('f2', Rook(colors.WHITE))
+        self.board.set_square_to_piece('b8', Rook(colors.WHITE))
+        self.board.kings[colors.BLACK] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertTrue(self.rules.is_stalemate(colors.BLACK, self.board), 'Black is stalemated')
+        
+    def testWhiteIsNotStalematedWithOtherPiecesToMove(self):
+        self.board.set_square_to_piece('a1', King(colors.WHITE))
+        self.board.set_square_to_piece('e6', Pawn(colors.WHITE))
+        self.board.set_square_to_piece('f2', Rook(colors.BLACK))
+        self.board.set_square_to_piece('b8', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertFalse(self.rules.is_stalemate(colors.WHITE, self.board), 'White is not stalemated')
+        
+    def testBlackIsNotStalematedWithOtherPiecesToMove(self):
+        self.board.set_square_to_piece('a1', King(colors.BLACK))
+        self.board.set_square_to_piece('e6', Pawn(colors.BLACK))
+        self.board.set_square_to_piece('f2', Rook(colors.WHITE))
+        self.board.set_square_to_piece('b8', Rook(colors.WHITE))
+        self.board.kings[colors.BLACK] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertFalse(self.rules.is_stalemate(colors.BLACK, self.board), 'Black is not stalemated')
+        
+    def testWhiteIsNotStalematedWithKingToMove(self):
+        self.board.set_square_to_piece('a1', King(colors.WHITE))
+        self.board.set_square_to_piece('f3', Rook(colors.BLACK))
+        self.board.set_square_to_piece('b8', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertFalse(self.rules.is_stalemate(colors.WHITE, self.board), 'White is not stalemated')
+        
+    def testBlackIsNotStalematedWithKingToMove(self):
+        self.board.set_square_to_piece('a1', King(colors.BLACK))
+        self.board.set_square_to_piece('f3', Rook(colors.WHITE))
+        self.board.set_square_to_piece('b8', Rook(colors.WHITE))
+        self.board.kings[colors.BLACK] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertFalse(self.rules.is_stalemate(colors.BLACK, self.board), 'Black is not stalemated')
+        
+    def testWhiteIsStalemateWithOwnPieceBlocking(self):
+        self.board.set_square_to_piece('a1', King(colors.WHITE))
+        self.board.set_square_to_piece('a2', Pawn(colors.WHITE))
+        self.board.set_square_to_piece('a3', Pawn(colors.BLACK))
+        self.board.set_square_to_piece('b8', Rook(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertTrue(self.rules.is_stalemate(colors.WHITE, self.board), 'White is stalemated')
+        
+class TestCheckmateRules(unittest.TestCase):
+
+    def setUp(self):
+        self.rules = VanillaRules()
+        self.board = ClassicBoard()
+        self.board.clear_board()
+
+    def tearDown(self):
+        pass
+    
+    def testWhiteCheckmateWithNoOtherPieces(self):
+        self.board.set_square_to_piece('a1', King(colors.WHITE))
+        self.board.set_square_to_piece('f2', Rook(colors.BLACK))
+        self.board.set_square_to_piece('b8', Rook(colors.BLACK))
+        self.board.set_square_to_piece('c3', Bishop(colors.BLACK))
+        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
+        
+        self.assertTrue(self.rules.is_checkmate(colors.WHITE, self.board), 'White is checkmated')
+    
 if __name__ == "__main__":
     unittest.main()
