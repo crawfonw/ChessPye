@@ -15,7 +15,7 @@ Note on the move_rules dict:
     rules class if you want them to interact with game_variables (duh)
 '''
 
-from chesspye.board.pieces import colors, move_types, piece_types
+from chesspye.board.pieces import colors, move_types, piece_types, Pawn
 from chesspye.utils import Vec2d
 
 from copy import deepcopy
@@ -96,30 +96,24 @@ class VanillaRules(Rules):
     
     #Endgame checks, called from game object
     def is_game_over(self, color, board): #color: is this color check/stalemated?
-        if self.is_fifty_move() or self.is_threefold_repeition() or self.is_stalemate(color, board):
-            return 'stale'
+        if self.is_fifty_move():
+            return 'draw (50 move)'
+        elif self.is_threefold_repeition():
+            return 'draw (3-move rep)'
         elif self.is_checkmate(color, board):
-            return 'mate'
+            return 'checkmate'
+        elif self.is_stalemate(color, board):
+            return 'draw (stalemate)'
         else:
             return ''
     
     def is_stalemate(self, color, board):
-        loc = board.kings[color]
-        king = board.pieces[loc]
-
-        for move in king.attack_patterns(): #maybe use all_patterns() to support variants with odd pieces
-            square = tuple(Vec2d(loc) + Vec2d(move))
-            if self.is_valid_move(loc, square, board):
-                return False
+        if self.can_king_move(color, board):
+            return False
+        if self.can_other_piece_move(color, board):
+            return False
         
-        for loc, piece in board.get_pieces_for_color(color):
-            for move in piece.all_patterns():
-                square = tuple(Vec2d(loc) + Vec2d(move))
-                if self.is_valid_move(loc, square, board):
-                    return False
-                
         return True
-    
     
     def is_checkmate(self, color, board):
         '''
@@ -133,12 +127,77 @@ class VanillaRules(Rules):
             moves for those pieces on that given vector and see if any of the
             current color's pieces can move to those squares or capture.
         '''
-        #return self.is_stalemate() and self.is_king_in_check(color, board)
+        if self.is_king_in_check(color, board):
+            if self.can_king_move(color, board):
+                return False
+            elif self.can_a_piece_block_or_take_check(color, board):
+                return False
+            else:
+                return True
+        else:
+            return False
+    
+    def can_king_move(self, color, board):
+        loc = board.kings[color]
+        king = board.pieces[loc]
+        for move in king.attack_patterns(): #maybe use all_patterns() to support variants with odd pieces
+            square = tuple(Vec2d(loc) + Vec2d(move))
+            if self.is_valid_move(loc, square, board):
+                return True
+            
+    def can_other_piece_move(self, color, board):
+        for loc, piece in board.get_pieces_for_color(color):
+            if piece.piece_type != piece_types.KING:
+                for move in piece.all_patterns():
+                    square = tuple(Vec2d(loc) + Vec2d(move))
+                    if self.is_valid_move(loc, square, board):
+                        return True
+    
+    #this is getting out of hand
+    #again might not work for funny-moving pieces that don't jump
+    def can_a_piece_block_or_take_check(self, color, board):
+        king_sq = board.kings[color]
+        checking_pieces = []
+        for loc, piece in board.get_pieces_for_color(color * -1): #get attacking army
+            attack = self.is_valid_move(loc, king_sq, board) 
+            if attack is not None:
+                checking_pieces.append((loc, piece, attack['atk_vec']))
+        if len(checking_pieces) > 1:
+            return False
+        for loc, piece, atk_vec in checking_pieces:
+            if piece.can_jump:
+                return False
+            all_valid_squares = self.generate_all_valid_target_squares_for_attack_vector(loc, piece, atk_vec, board)
+            all_valid_squares.append(loc) #take the piece
+            for square in all_valid_squares:
+                for loc, piece in board.get_pieces_for_color(color): #get your pieces
+                    if piece.piece_type != piece_types.KING:
+                        if self.is_valid_move(loc, square, board):
+                            return True
+        return False
+    
+    #TODO: fix for MAX move jumpy pieces
+    def generate_all_valid_target_squares_for_attack_vector(self, from_sq, piece, av, board):
+        valid_squares = []
+        if piece.move_type == move_types.MAX and not piece.can_jump:
+            curr_square = tuple(Vec2d(from_sq) + av)
+            while True: 
+                if not board.square_is_on_board(curr_square):
+                    break
+                if board[curr_square] is not None: #since we check for jumper already
+                    valid_squares.append(curr_square)
+                    break
+                valid_squares.append(curr_square)
+        else:
+            for move in piece.attack_patterns():
+                curr_square = tuple(Vec2d(from_sq) + av)
+                valid_squares.append(curr_square)
+        return valid_squares
     
     def is_fifty_move(self):
         return self.game_variables['fifty_move_counter'] >= 100
     
-    def is_threefold_repeition(self): #might need to do some fun hash stuff here
+    def is_threefold_repetition(self): #might need to do some fun hash stuff here
         pass
     
     #Movement/board state validators
@@ -171,15 +230,15 @@ class VanillaRules(Rules):
             return rule_to_apply
         return None
     
-    def is_square_guarded_by(self, square, color, board):
+    def is_square_guarded_by(self, occupied_square, color, board): #might remove this method eventually for below method
         colored_pieces = []
         for loc, piece in board.pieces.items():
             if piece is not None:
                 if piece.color == color:
                     colored_pieces.append((loc, piece))
         for loc, piece in colored_pieces:
-            move_vector = Vec2d(square) - Vec2d(loc)
-            if self.generic_move_rule(loc, square, move_vector, piece, board) is not None:
+            move_vector = Vec2d(occupied_square) - Vec2d(loc)
+            if self.generic_move_rule(loc, occupied_square, move_vector, piece, board) is not None:
                 return True
         return False
     
@@ -207,7 +266,7 @@ class VanillaRules(Rules):
             for move in pattern_types:
                 if Vec2d(move) + Vec2d(from_sq) == Vec2d(to_sq):
                     if piece.can_jump:
-                        return {'name':'generic', 'from_sq':from_sq, 'to_sq':to_sq}
+                        return {'name':'generic', 'from_sq':from_sq, 'to_sq':to_sq, 'atk_vec':Vec2d(move)}
                     else:
                         #This piece can move here assuming it is unblocked
                         #Now find the straight-line path and make sure nothing is blocking
@@ -221,7 +280,7 @@ class VanillaRules(Rules):
                                 break
                             curr_sq += unit_move
                         if tuple(curr_sq) == to_sq:
-                            return {'name':'generic', 'from_sq':from_sq, 'to_sq':to_sq}
+                            return {'name':'generic', 'from_sq':from_sq, 'to_sq':to_sq, 'atk_vec':Vec2d(move)}
             return None
         elif piece.move_type == move_types.MAX:
             for move in pattern_types:
@@ -238,7 +297,7 @@ class VanillaRules(Rules):
                             break
                         curr_sq += dir_vec
                     if tuple(curr_sq) == to_sq:
-                        return {'name':'generic', 'from_sq':from_sq, 'to_sq':to_sq}
+                        return {'name':'generic', 'from_sq':from_sq, 'to_sq':to_sq, 'atk_vec':Vec2d(move)}
             return None
 
     def en_passante_rule(self, from_sq, to_sq, move_vector, piece, board):
