@@ -104,6 +104,6 @@ class King(ChessPiece):
         super(King, self).__init__('King', color, piece_types.KING, 999, 9812, 'K', times_moved, move_types.EXACT)
         
     def move_patterns(self):
-        return [(1,0), (-1,0), (0,1), (0,-1), (1,1), (1,-1), (-1,1), (-1,-1), (0,2), (0,-2)]
+        return [(1,0), (-1,0), (0,1), (0,-1), (1,1), (1,-1), (-1,1), (-1,-1)]
     
     attack_patterns = move_patterns

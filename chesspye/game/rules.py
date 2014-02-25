@@ -202,34 +202,45 @@ class VanillaRules(Rules):
         if piece.piece_type == piece_types.KING and move_vector.get_length() == 2:
             if piece.has_moved():
                 return None
-            if self.generic_move_rule(from_sq, to_sq, move_vector, piece, board):
-                if piece.color == colors.WHITE:
-                    if self.game_variables['white_can_kingside_castle'] and move_vector == Vec2d(0,2):
-                            rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
-                            rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
-                    elif self.game_variables['white_can_queenside_castle'] and move_vector == Vec2d(0,-2):
-                        rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
-                        rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
-                    else:
+            if piece.color == colors.WHITE:
+                if self.game_variables['white_can_kingside_castle'] and move_vector == Vec2d(0,2):
+                    if board.pieces[to_sq] is not None or board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,-1))] is not None:
                         return None
-                elif piece.color == colors.BLACK:
-                    if self.game_variables['black_can_kingside_castle'] and move_vector == Vec2d(0,2):
-                        rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
-                        rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
-                    elif self.game_variables['black_can_queenside_castle'] and move_vector == Vec2d(0,-2):
-                        rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
-                        rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
-                    else:
+                    rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
+                    rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
+                elif self.game_variables['white_can_queenside_castle'] and move_vector == Vec2d(0,-2):
+                    if board.pieces[to_sq] is not None or \
+                        board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,1))] is not None or \
+                        board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,-1))] is not None:
                         return None
-                
-                if not board.square_is_on_board(rook_loc):
+                    rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
+                    rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
+                else:
                     return None
-                rook = board.pieces[rook_loc]
-                if rook is None or rook.piece_type != piece_types.ROOK or rook.has_moved():
+            elif piece.color == colors.BLACK:
+                if self.game_variables['black_can_kingside_castle'] and move_vector == Vec2d(0,2):
+                    if board.pieces[to_sq] is not None or board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,-1))] is not None:
+                        return None
+                    rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
+                    rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
+                elif self.game_variables['black_can_queenside_castle'] and move_vector == Vec2d(0,-2):
+                    if board.pieces[to_sq] is not None or \
+                        board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,1))] is not None or \
+                        board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,-1))] is not None:
+                        return None
+                    rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
+                    rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
+                else:
                     return None
+            
+            if not board.square_is_on_board(rook_loc):
+                return None
+            rook = board.pieces[rook_loc]
+            if rook is None or rook.piece_type != piece_types.ROOK or rook.has_moved():
+                return None
 
-                return {'name':'castle', 'from_sq':from_sq, 'to_sq':to_sq, 'rook_loc':rook_loc, \
-                        'rook_dest':rook_dest}
+            return {'name':'castle', 'from_sq':from_sq, 'to_sq':to_sq, 'rook_loc':rook_loc, \
+                    'rook_dest':rook_dest}
             
     def do_move(self, action, data, board):
         return self.move_actions[action](data, board)

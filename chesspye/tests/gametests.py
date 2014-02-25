@@ -98,7 +98,7 @@ class TestPieceMovement(unittest.TestCase):
     def testWhiteEnPassentToLeft(self):
         black_pawn = Pawn(colors.BLACK)
         black_pawn.times_moved = 1
-        moves = Stack([(black_pawn, None, None)]) #The squares shouldn't matter
+        self.game.board.moves.push((black_pawn, None, None))
         
         self.game.board.set_square_to_piece('e5', Pawn(colors.WHITE))
         self.game.board.set_square_to_piece('d5', black_pawn)
@@ -108,7 +108,7 @@ class TestPieceMovement(unittest.TestCase):
     def testWhiteEnPassentToRight(self):
         black_pawn = Pawn(colors.BLACK)
         black_pawn.times_moved = 1
-        moves = Stack([(black_pawn, None, None)])
+        self.game.board.moves.push((black_pawn, None, None))
         
         self.game.board.set_square_to_piece('e5', Pawn(colors.WHITE))
         self.game.board.set_square_to_piece('f5', black_pawn)
@@ -118,7 +118,7 @@ class TestPieceMovement(unittest.TestCase):
     def testBlackEnPassentToLeft(self):
         white_pawn = Pawn(colors.WHITE)
         white_pawn.times_moved = 1
-        moves = Stack([(white_pawn, None, None)])
+        self.game.board.moves.push((white_pawn, None, None))
         
         self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
         self.game.board.set_square_to_piece('d4', white_pawn)
@@ -128,7 +128,7 @@ class TestPieceMovement(unittest.TestCase):
     def testBlackEnPassentToRight(self):
         white_pawn = Pawn(colors.WHITE)
         white_pawn.times_moved = 1
-        moves = Stack([(white_pawn, None, None)])
+        self.game.board.moves.push((white_pawn, None, None))
         
         self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
         self.game.board.set_square_to_piece('f4', white_pawn)
@@ -139,18 +139,18 @@ class TestPieceMovement(unittest.TestCase):
         other_piece = Rook(colors.WHITE)
         white_pawn = Pawn(colors.WHITE)
         white_pawn.times_moved = 1
-        moves = Stack([(white_pawn, None, None)])
-        moves.push((other_piece, None, None))
         
         self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
         self.game.board.set_square_to_piece('f4', white_pawn)
+        self.game.board.set_square_to_piece('a1', other_piece)
         
+        self.game.rules.move_piece('a1', 'a2', self.game.board)
         self.assertFalse(self.game.rules.move_piece('e4', 'f3', self.game.board), 'Pawn cannot en passante after two turns')
         
     def testCannotEnPassentPawnThatHasMovedTwoSpacesOneAtATime(self):
         white_pawn = Pawn(colors.WHITE)
         white_pawn.times_moved = 2
-        moves = Stack([(white_pawn, None, None)])
+        self.game.board.moves.push((white_pawn, None, None))
         
         self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
         self.game.board.set_square_to_piece('f4', white_pawn)
@@ -160,7 +160,7 @@ class TestPieceMovement(unittest.TestCase):
     def testCannotEnPassentNonPawn(self):
         white_rook = Rook(colors.WHITE)
         white_rook.times_moved = 1
-        moves = Stack([(white_rook, None, None)])
+        self.game.board.moves.push((white_rook, None, None))
         
         self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
         self.game.board.set_square_to_piece('f4', white_rook)
@@ -171,7 +171,7 @@ class TestPieceMovement(unittest.TestCase):
         #Would this even happen?
         white_pawn = Pawn(colors.BLACK)
         white_pawn.times_moved = 1
-        moves = Stack([(white_pawn, None, None)])
+        self.game.board.moves.push((white_pawn, None, None))
         
         self.game.board.set_square_to_piece('e4', Pawn(colors.BLACK))
         self.game.board.set_square_to_piece('f4', white_pawn)
