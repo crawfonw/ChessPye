@@ -289,12 +289,12 @@ class VanillaRules(Rules):
                         self.game_variables['white_can_kingside_castle'] = False
                     elif from_sq == (0,0):
                         self.game_variables['white_can_queenside_castle'] = False
-                elif piece.color == colors.BLACK:
-                    if not piece.has_moved():
-                        if from_sq == (7,7):
-                            self.game_variables['black_can_kingside_castle'] = False
-                        elif from_sq == (7,0):
-                            self.game_variables['black_can_queenside_castle'] = False
+            elif piece.color == colors.BLACK:
+                if not piece.has_moved():
+                    if from_sq == (7,7):
+                        self.game_variables['black_can_kingside_castle'] = False
+                    elif from_sq == (7,0):
+                        self.game_variables['black_can_queenside_castle'] = False
         
         piece.times_moved += 1
         return True
