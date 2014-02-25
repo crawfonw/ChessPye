@@ -449,7 +449,10 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.set_square_to_piece('h1', Rook(colors.WHITE))
         self.game.board.set_square_to_piece('e1', King(colors.WHITE))
         self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('e1')
-        self.game.board.set_square_to_piece('h8', Rook(colors.BLACK))
+        self.game.board.set_square_to_piece('g8', Rook(colors.BLACK))
+        
+        print self.game.rules.is_square_guarded_by(self.game.board.algebraic_to_coordinate_square('g1'), colors.BLACK, self.game.board)
+        print self.game.board
         
         self.assertFalse(self.game.rules.move_piece('e1', 'g1', self.game.board), 'King should not be able to castle into check')
         self.assertTrue(self.game.board.get_square('e1').piece_type == piece_types.KING, 'Piece on e1 should be a King')
@@ -485,6 +488,18 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.set_square_to_piece('f8', Rook(colors.BLACK))
         
         self.assertFalse(self.game.rules.move_piece('f5', 'e4', self.game.board), 'Bishop is pinned')
+        
+    def testCannotEnPassanteIntoCheck(self):
+        black_pawn = Pawn(colors.BLACK, times_moved=1)
+        self.game.board.moves.push((black_pawn, None, None))
+        
+        self.game.board.set_square_to_piece('f1', King(colors.WHITE))
+        self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('f1')
+        self.game.board.set_square_to_piece('f5', Pawn(colors.WHITE))
+        self.game.board.set_square_to_piece('f8', Rook(colors.BLACK))
+        self.game.board.set_square_to_piece('g5', black_pawn)
+        
+        self.assertFalse(self.game.rules.move_piece('f5', 'g6', self.game.board), 'Pawn is pinned')
     
     def testKingMustMoveWhenInCheck(self):
         self.game.board.set_square_to_piece('f1', King(colors.WHITE))
@@ -493,6 +508,15 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.set_square_to_piece('f8', Rook(colors.BLACK))
         
         self.assertFalse(self.game.rules.move_piece('e5', 'e6', self.game.board), 'King must move out of check')
+        
+    def testKingIsCheckedByPawn(self):
+        self.game.board.set_square_to_piece('e4', King(colors.WHITE))
+        self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('f1')
+        self.game.board.set_square_to_piece('e5', Pawn(colors.BLACK))
+        
+        self.assertFalse(self.game.rules.move_piece('e4', 'd4', self.game.board), 'King cannot move into check')
+        self.assertFalse(self.game.rules.move_piece('e4', 'f4', self.game.board), 'King cannot move into check')
+        
     
     def testCanBlockCheckingPiece(self):
         self.game.board.set_square_to_piece('f1', King(colors.WHITE))

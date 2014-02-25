@@ -129,7 +129,7 @@ class VanillaRules(Rules):
                     colored_pieces.append((loc, piece))
         for loc, piece in colored_pieces:
             move_vector = Vec2d(loc) - Vec2d(square)
-            if self.generic_move_rule(loc, square, move_vector, piece, board):
+            if self.generic_move_rule(loc, square, move_vector, piece, board) is not None:
                 return True
         return False
     
@@ -166,11 +166,13 @@ class VanillaRules(Rules):
                         curr_sq = Vec2d(from_sq) + unit_move
                         while tuple(curr_sq) != to_sq:
                             if not board.square_is_on_board(tuple(curr_sq)):
-                                return None
+                                break
                             if board.pieces[tuple(curr_sq)] is not None:
-                                return None
+                                break
                             curr_sq += unit_move
-                        return {'name':'generic', 'from_sq':from_sq, 'to_sq':to_sq}
+                        if tuple(curr_sq) == to_sq:
+                            return {'name':'generic', 'from_sq':from_sq, 'to_sq':to_sq}
+            return None
         elif piece.move_type == move_types.MAX:
             for move in pattern_types:
                 dir_vec = Vec2d(move) #a unit vector
@@ -181,11 +183,13 @@ class VanillaRules(Rules):
                     curr_sq = Vec2d(from_sq) + dir_vec
                     while tuple(curr_sq) != to_sq:
                         if not board.square_is_on_board(tuple(curr_sq)):
-                            return None
+                            break
                         if board.pieces[tuple(curr_sq)] is not None and not piece.can_jump:
-                            return None
+                            break
                         curr_sq += dir_vec
-                    return {'name':'generic', 'from_sq':from_sq, 'to_sq':to_sq}
+                    if tuple(curr_sq) == to_sq:
+                        return {'name':'generic', 'from_sq':from_sq, 'to_sq':to_sq}
+            return None
 
     def en_passante_rule(self, from_sq, to_sq, move_vector, piece, board):
         if piece.piece_type == piece_types.PAWN and tuple(move_vector) in piece.attack_patterns():
@@ -204,14 +208,21 @@ class VanillaRules(Rules):
                 return None
             if piece.color == colors.WHITE:
                 if self.game_variables['white_can_kingside_castle'] and move_vector == Vec2d(0,2):
+                    #check explicitly for blocking pieces or guarded squares
                     if board.pieces[to_sq] is not None or board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,-1))] is not None:
+                        return None
+                    if self.is_square_guarded_by(to_sq, colors.BLACK, board) or \
+                        self.is_square_guarded_by(tuple(Vec2d(to_sq) + Vec2d(0,-1)), colors.BLACK, board):
                         return None
                     rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
                     rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
                 elif self.game_variables['white_can_queenside_castle'] and move_vector == Vec2d(0,-2):
-                    if board.pieces[to_sq] is not None or \
-                        board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,1))] is not None or \
+                    if board.pieces[to_sq] is not None or board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,1))] is not None or \
                         board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,-1))] is not None:
+                        return None
+                    if self.is_square_guarded_by(to_sq, colors.BLACK, board) or \
+                        self.is_square_guarded_by(tuple(Vec2d(to_sq) + Vec2d(0,1)), colors.BLACK, board) or \
+                         self.is_square_guarded_by(tuple(Vec2d(to_sq) + Vec2d(0,-1)), colors.BLACK, board):
                         return None
                     rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
                     rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
@@ -221,12 +232,18 @@ class VanillaRules(Rules):
                 if self.game_variables['black_can_kingside_castle'] and move_vector == Vec2d(0,2):
                     if board.pieces[to_sq] is not None or board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,-1))] is not None:
                         return None
+                    if self.is_square_guarded_by(to_sq, colors.WHITE, board) or \
+                        self.is_square_guarded_by(tuple(Vec2d(to_sq) + Vec2d(0,-1)), colors.WHITE, board):
+                        return None
                     rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,1))
                     rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,-1))
                 elif self.game_variables['black_can_queenside_castle'] and move_vector == Vec2d(0,-2):
-                    if board.pieces[to_sq] is not None or \
-                        board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,1))] is not None or \
+                    if board.pieces[to_sq] is not None or board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,1))] is not None or \
                         board.pieces[tuple(Vec2d(to_sq) + Vec2d(0,-1))] is not None:
+                        return None
+                    if self.is_square_guarded_by(to_sq, colors.WHITE, board) or \
+                        self.is_square_guarded_by(tuple(Vec2d(to_sq) + Vec2d(0,1)), colors.WHITE, board) or \
+                         self.is_square_guarded_by(tuple(Vec2d(to_sq) + Vec2d(0,-1)), colors.WHITE, board):
                         return None
                     rook_loc = tuple(Vec2d(to_sq) + Vec2d(0,-2))
                     rook_dest = tuple(Vec2d(to_sq) + Vec2d(0,1))
@@ -285,7 +302,9 @@ class VanillaRules(Rules):
         rook_loc = data['rook_loc']
         rook_dest = data['rook_dest']
         piece = board.pieces[from_sq]
-        rook = board.pieces[rook_loc] 
+        rook = board.pieces[rook_loc]
+        
+        board.kings[piece.color] = to_sq 
         
         board.pieces[from_sq] = None
         board.pieces[to_sq] = piece
