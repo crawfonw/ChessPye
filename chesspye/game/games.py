@@ -10,9 +10,10 @@ from rules import VanillaRules
 
 class VanillaChess(object):
 
-    def __init__(self, white_player, black_player):
+    def __init__(self, white_player, black_player, interface):
         self.board = ClassicBoard()
         self.rules = VanillaRules()
+        self.interface = interface
         self.white_player = white_player
         self.black_player = black_player
         
@@ -30,7 +31,13 @@ class VanillaChess(object):
                     self.dispatch_promotion_choice()
     
     def dispatch_promotion_choice(self):
-        return None
+        return interface.promote()
+    
+    def check_for_endgame(self, color):
+        result = self.rules.is_game_over(color)
+        if result:
+            return result
+        return False
     
     def play_game(self):
         pass

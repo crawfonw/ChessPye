@@ -94,6 +94,22 @@ class VanillaRules(Rules):
         else:
             return False
     
+    #Endgame checks, called from game object
+    def is_game_over(self, color): #color: is this color check/stalemated?
+        pass
+    
+    def is_stalemate(self):
+        pass
+    
+    def is_checkmate(self):
+        pass
+    
+    def is_fifty_move(self):
+        return self.game_variables['fifty_move_counter'] >= 100
+    
+    def is_threefold_repeition(self):
+        pass
+    
     #Movement/board state validators
     def is_valid_move(self, from_sq, to_sq, board):
         if from_sq == to_sq:
@@ -116,10 +132,13 @@ class VanillaRules(Rules):
             if rule_to_apply is None:
                 return None
             board_copy = deepcopy(board)
+            move_count = self.game_variables['fifty_move_counter'] 
             self.do_move(rule_to_apply['name'], rule_to_apply, board_copy)
+            self.game_variables['fifty_move_counter'] = move_count
             if self.king_is_in_check(piece.color, board_copy):
                 del board_copy
                 return None
+            
             del board_copy
             return rule_to_apply
         return None
@@ -269,6 +288,10 @@ class VanillaRules(Rules):
         from_sq = data['from_sq']
         to_sq = data['to_sq']
         piece = board.pieces[from_sq]
+        if board.pieces[to_sq] is not None or piece.piece_type == piece_types.PAWN:
+            self.game_variables['fifty_move_counter'] = 0
+        else:
+            self.game_variables['fifty_move_counter'] += 1
         board.pieces[from_sq] = None
         board.pieces[to_sq] = piece
         
@@ -306,6 +329,7 @@ class VanillaRules(Rules):
         rook_dest = data['rook_dest']
         piece = board.pieces[from_sq]
         rook = board.pieces[rook_loc]
+        self.game_variables['fifty_move_counter'] += 1
         
         board.kings[piece.color] = to_sq 
         
