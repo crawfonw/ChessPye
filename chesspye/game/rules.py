@@ -128,7 +128,7 @@ class VanillaRules(Rules):
                 if piece.color == color:
                     colored_pieces.append((loc, piece))
         for loc, piece in colored_pieces:
-            move_vector = Vec2d(loc) - Vec2d(square)
+            move_vector = Vec2d(square) - Vec2d(loc)
             if self.generic_move_rule(loc, square, move_vector, piece, board) is not None:
                 return True
         return False

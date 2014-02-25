@@ -451,9 +451,6 @@ class TestPieceMovement(unittest.TestCase):
         self.game.board.kings[colors.WHITE] = self.game.board.algebraic_to_coordinate_square('e1')
         self.game.board.set_square_to_piece('g8', Rook(colors.BLACK))
         
-        print self.game.rules.is_square_guarded_by(self.game.board.algebraic_to_coordinate_square('g1'), colors.BLACK, self.game.board)
-        print self.game.board
-        
         self.assertFalse(self.game.rules.move_piece('e1', 'g1', self.game.board), 'King should not be able to castle into check')
         self.assertTrue(self.game.board.get_square('e1').piece_type == piece_types.KING, 'Piece on e1 should be a King')
         self.assertTrue(self.game.board.get_square('h1').piece_type == piece_types.ROOK, 'Piece on h1 should be a Rook')
