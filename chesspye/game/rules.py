@@ -113,11 +113,14 @@ class VanillaRules(Rules):
                 if rule_to_apply:
                     break
         
-            #At this point, all the rules passed, so let's make the move on a dummy board
-            #and test if we got ourselves in check
-            board_copy = None
-            if self.king_is_in_check(piece.color, board):
+            if rule_to_apply is None:
                 return None
+            board_copy = deepcopy(board)
+            self.do_move(rule_to_apply['name'], rule_to_apply, board_copy)
+            if self.king_is_in_check(piece.color, board_copy):
+                del board_copy
+                return None
+            del board_copy
             return rule_to_apply
         return None
     
