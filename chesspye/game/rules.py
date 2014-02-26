@@ -24,21 +24,11 @@ from math import copysign
 class Rules(object):
     
     def __init__(self):
-        self.move_rules = {} #These are all checked every move
-        self.move_actions = {} #These are executed when a specific move rule applies (actually move the pieces)
+        self.move_rules_and_actions = {}
         self.game_variables = {}
         
-    def register_move_rule(self, f, name=None):
-        if name is None:
-            self.move_rules[f.__name__] = f
-        else:
-            self.move_rules[name] = f
-            
-    def register_move_action(self, f, name=None):
-        if name is None:
-            self.move_actions[f.__name__] = f
-        else:
-            self.move_actions[name] = f
+    def register_move_rule_handler_pair(self, rule, handler):
+        self.move_rules_and_actions[rule] = handler
             
     def register_game_variable(self, name, val):
         self.game_variables[name] = val
@@ -53,14 +43,10 @@ class VanillaRules(Rules):
         self.register_game_variable('black_can_queenside_castle', True)
         self.register_game_variable('fifty_move_counter', 0)
         
-        self.register_move_rule(self.generic_move_rule, 'generic_move_rule')
-        self.register_move_action(self.handle_generic_move, 'generic')
         
-        self.register_move_rule(self.en_passante_rule, 'en_passante_rule')
-        self.register_move_action(self.handle_en_passante, 'en_passante')
-        
-        self.register_move_rule(self.castle_rule, 'castle_rule')
-        self.register_move_action(self.handle_castle, 'castle')
+        self.register_move_rule_handler_pair(self.generic_move_rule, self.handle_generic_move)
+        self.register_move_rule_handler_pair(self.en_passante_rule, self.handle_en_passante)
+        self.register_move_rule_handler_pair(self.castle_rule, self.handle_castle)
     
     #Methods to call from Game instance    
     def move_piece(self, from_sq, to_sq, board):
@@ -88,9 +74,11 @@ class VanillaRules(Rules):
                           board.algebraic_to_coordinate_square(to_sq), board)
 
     def move_piece_coordinate(self, from_sq, to_sq, board):
-        valid = self.is_valid_move(from_sq, to_sq, board) 
-        if valid is not None:
-            return self.do_move(valid['name'], valid, board)
+        rule_data = self.is_valid_move(from_sq, to_sq, board) 
+        if rule_data is not None:
+            if isinstance(rule_data, tuple): #Don't like this, too hacky
+                rule, data = rule_data
+                return self.move_rules_and_actions[rule](data, board)
         else:
             return False
     
@@ -159,9 +147,11 @@ class VanillaRules(Rules):
         king_sq = board.kings[color]
         checking_pieces = []
         for loc, piece in board.get_pieces_for_color(color * -1): #get attacking army
-            attack = self.is_valid_move(loc, king_sq, board) 
-            if attack is not None:
-                checking_pieces.append((loc, piece, attack['atk_vec']))
+            rule_data = self.is_valid_move(loc, king_sq, board) 
+            if rule_data is not None:
+                if isinstance(rule_data, tuple):
+                    rule, data = rule_data
+                    checking_pieces.append((loc, piece, data['atk_vec']))
         if len(checking_pieces) > 1:
             return False
         for loc, piece, atk_vec in checking_pieces:
@@ -215,23 +205,23 @@ class VanillaRules(Rules):
         piece = board.pieces[from_sq]
         if piece is not None:
             move_vector = Vec2d(to_sq) - Vec2d(from_sq)
-            for name, rule in self.move_rules.items():
-                rule_to_apply = rule(from_sq, to_sq, move_vector, piece, board) 
-                if rule_to_apply:
+            for rule in self.move_rules_and_actions.keys():
+                rule_data = rule(from_sq, to_sq, move_vector, piece, board) 
+                if rule_data:
                     break
         
-            if rule_to_apply is None:
+            if rule_data is None:
                 return None
             board_copy = deepcopy(board)
             move_count = self.game_variables['fifty_move_counter'] 
-            self.do_move(rule_to_apply['name'], rule_to_apply, board_copy)
+            self.move_rules_and_actions[rule](rule_data, board_copy)
             self.game_variables['fifty_move_counter'] = move_count
             if self.is_king_in_check(piece.color, board_copy):
                 del board_copy
                 return None
             
             del board_copy
-            return rule_to_apply
+            return (rule, rule_data)
         return None
     
     def is_square_guarded_by(self, occupied_square, color, board): #might remove this method eventually for below method
