@@ -37,6 +37,17 @@ class ChessPiece(object):
             % (self.__class__.__name__, self.long_name, self.color, self.piece_type, \
                self.value, self.utf_code_white, self.algebraic, self.times_moved)
     
+    #These are needed to hash the boards for easy three fold repetition detection
+    #I don't particularly like this, but in terms of hashing for repetition detection it's all we need to check
+    def __hash__(self):
+        return hash(self.piece_type)
+    
+    def __eq__(self, o):
+        if isinstance(o, ChessPiece):
+            return self.piece_type == o.piece_type
+        else:
+            return False
+    
     def move_patterns(self):
         '''
             Returns a list of tuples with xy modifier coordinates of how

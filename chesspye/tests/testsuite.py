@@ -7,9 +7,8 @@ Created on Jun 22, 2013
 import unittest
 
 from boardtests import *
+from gametests import *
+from ruletests import *
 
 if __name__ == '__main__':
-    test_classes = [TestBoardCreation, TestCoordinateToAlgebraicConversions]
-    suites = map(unittest.TestLoader().loadTestsFromTestCase, test_classes)
-    alltests = unittest.TestSuite(suites)
-    unittest.TextTestRunner(verbosity=1).run(alltests)
+    unittest.TextTestRunner(verbosity=1).run()

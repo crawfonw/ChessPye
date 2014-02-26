@@ -36,6 +36,17 @@ class Board(object):
         s += '\n'
         return s.encode('UTF-8')
     
+    def __eq__(self, o):
+        if isinstance(o, Board):
+            return self.pieces == o.pieces and \
+                self.height == o.height and self.width == o.width
+        else:
+            return False
+    
+    def __hash__(self):
+        return hash((tuple([i for i in self.pieces.items()]), \
+                     self.height, self.width))
+    
     def __repr__(self):
         s = 'Board(width=%s,height=%s) Contents:\n' % (self.width, self.height)
         for piece in self.pieces.viewitems():
