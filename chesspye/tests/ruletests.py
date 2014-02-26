@@ -1634,6 +1634,16 @@ class TestCheckmateRules(unittest.TestCase):
         self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('a1')
         
         self.assertFalse(self.rules.can_a_piece_block_or_take_check(colors.WHITE, self.board), 'White cannot block with either rook')
+
+class TestThreeMoveRepetitionRule(unittest.TestCase):
     
+    def setUp(self):
+        self.rules = VanillaRules()
+        self.board = ClassicBoard()
+        self.board.clear_board()
+
+    def tearDown(self):
+        pass
+
 if __name__ == "__main__":
     unittest.main()

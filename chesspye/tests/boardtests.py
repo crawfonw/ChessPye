@@ -171,7 +171,71 @@ class TestCoordinateToAlgebraicConversions(unittest.TestCase):
         self.skipTest('Not implemented')
         
     def testConvertCoordinateToAlgebraicPawnPromotion(self):
-        self.skipTest('Not implemented') 
+        self.skipTest('Not implemented')
+        
+class TestBoardHashing(unittest.TestCase):
+    
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+    
+    def testFullBoardEquality(self):
+        board1 = ClassicBoard()
+        board2 = ClassicBoard()
+        
+        self.assertEqual(board1, board2, 'Boards are set up the same')
+        
+    def testFullAndEmptyBoardInequality(self):
+        board1 = ClassicBoard()
+        board2 = ClassicBoard()
+        board2.clear_board()
+        
+        self.assertNotEqual(board1, board2, 'Boards are not set up the same')
+        
+    def testSameMemoryObjectSinglePiecesBoardEquality(self):
+        board1 = ClassicBoard()
+        board2 = ClassicBoard()
+        board1.clear_board()
+        board2.clear_board()
+        
+        white_rook = Rook(colors.WHITE)
+        board1.set_square_to_piece('h1', white_rook)
+        board2.set_square_to_piece('h1', white_rook)
+        
+        self.assertEqual(board1, board2, 'Boards are set up the same')
+        
+    def testDifferentMemoryObjectSinglePiecesBoardEquality(self):
+        board1 = ClassicBoard()
+        board2 = ClassicBoard()
+        board1.clear_board()
+        board2.clear_board()
+        
+        white_rook1 = Rook(colors.WHITE)
+        white_rook2 = Rook(colors.WHITE)
+        board1.set_square_to_piece('h1', white_rook1)
+        board2.set_square_to_piece('h1', white_rook2)
+        
+        self.assertEqual(board1, board2, 'Boards are set up the same')
+        
+    def testDifferentSizedBoardsAreNotEqual(self):
+        board1 = Board(8,8)
+        board2 = Board(9,9)
+        
+        self.assertNotEqual(board1, board2, 'Boards are different dimensions')
+        
+    def testDifferentWidthBoardsAreNotEqual(self):
+        board1 = Board(8,8)
+        board2 = Board(9,8)
+        
+        self.assertNotEqual(board1, board2, 'Boards widths are different size')
+        
+    def testDifferentWidthBoardsAreNotEqual(self):
+        board1 = Board(8,8)
+        board2 = Board(8,9)
+        
+        self.assertNotEqual(board1, board2, 'Boards heights are different size')
 
 if __name__ == "__main__":
     unittest.main()

@@ -167,6 +167,8 @@ class VanillaRules(Rules):
         for loc, piece, atk_vec in checking_pieces:
             if piece.can_jump:
                 return False
+            #I think I might redo this by intersecting vectors then check
+            #for takes or just that intersection
             all_valid_squares = self.generate_all_valid_target_squares_for_attack_vector(loc, piece, atk_vec, board)
             all_valid_squares.append(loc) #take the piece
             for square in all_valid_squares:
@@ -176,15 +178,16 @@ class VanillaRules(Rules):
                             return True
         return False
     
-    #TODO: fix for MAX move jumpy pieces
     def generate_all_valid_target_squares_for_attack_vector(self, from_sq, piece, av, board):
         valid_squares = []
-        if piece.move_type == move_types.MAX and not piece.can_jump:
+        if piece.move_type == move_types.MAX:
             curr_square = tuple(Vec2d(from_sq) + av)
             while True:
                 if not board.square_is_on_board(curr_square):
                     break
-                if board.pieces[curr_square] is not None: #since we check for jumper already
+                #think this works with MAX and jumpy
+                #TODO: test this
+                if board.pieces[curr_square] is not None and not piece.can_jump:
                     valid_squares.append(curr_square)
                     break
                 valid_squares.append(curr_square)
