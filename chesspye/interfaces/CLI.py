@@ -5,7 +5,7 @@ Created on Feb 27, 2014
 '''
 
 from chesspye.interfaces import Interface
-from chesspye.players.players import player_types
+from chesspye.players import player_types
 
 class CLI(Interface):
     
@@ -18,10 +18,8 @@ class CLI(Interface):
     def draw_board_update(self, board):
         print str(board)
         
-    def offer_move(self, player):
-        if player.type == player_types.AI:
-            return player.move()
-        elif player.type == player_types.HUMAN:
+    def offer_move_to_human(self, player):
+        if player.type == player_types.HUMAN:
             print '%s to move.' % player.name
             return raw_input('Enter move ([from]-[to]):\n')
         else:

@@ -6,6 +6,7 @@ Created on Jun 20, 2013
 
 from chesspye.boards import ClassicBoard
 from chesspye.pieces import piece_types, colors
+from chesspye.players import player_types
 from chesspye.rules import VanillaRules
 
 class VanillaChess(object):
@@ -17,6 +18,10 @@ class VanillaChess(object):
         self.interface = interface
         self.players = [white_player, black_player]
         self.active_player_id = 0
+        
+        for player in self.players:
+            if player.type == player_types.AI:
+                player.register_game(self) #might be bad
         
     def __repr__(self):
         return 'VanillaChess(white_player=%r, black_player=%r)' % (self.white_player, self.black_player)
@@ -57,24 +62,34 @@ class VanillaChess(object):
         self.handle_pawn_promotion()
     
     def play_game(self):
+        self.interface.draw_board_update(self.board)
         while True:
-            self.interface.draw_board_update(self.board)
-            move = self.interface.offer_move(self.active_player())
+            if self.active_player().type == player_types.AI:
+                move = self.active_player().move()
+            elif self.active_player().type == player_types.HUMAN:
+                move = self.interface.offer_move_to_human(self.active_player())
+            else:
+                raise TypeError()
+            
             if isinstance(move, str):
                 from_sq, to_sq = move.split('-')
             elif isinstance(move, tuple):
                 from_sq, to_sq = move
             else:
                 from_sq, to_sq = (None, None)
+            
             is_valid = self.rules.move_piece(from_sq, to_sq, self.board)
             if is_valid:
                 self.end_of_turn_cleanup()
-                if self.end_of_game(self.active_player().color * -1):
+                is_end = self.end_of_game(self.active_player().color * -1)
+                if is_end:
                     break
                 else:
                     self.next_player()
             else:
                 self.interface.display_message('Invalid move')
+            self.interface.draw_board_update(self.board)
+        print 'Game over! %s' % is_end
         return self.active_player()
 
 ''' This will probably be moved to an AI player since they would only use this...

@@ -7,3 +7,4 @@ Created on Feb 27, 2014
 from Enums import player_types
 from Player import Player
 from HumanPlayer import HumanPlayer
+from RandomAI import RandomAI

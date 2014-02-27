@@ -60,7 +60,7 @@ class ChessPiece(object):
         raise NotImplementedError()
     
     def all_patterns(self):
-        return set(self.move_patterns()).union(set(self.attack_patterns()))
+        return list(set(self.move_patterns()).union(set(self.attack_patterns())))
     
     def has_moved(self):
         return self.times_moved > 0
