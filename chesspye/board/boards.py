@@ -44,7 +44,7 @@ class Board(object):
             return False
     
     def __hash__(self):
-        return hash((tuple([i for i in self.pieces.items()]), \
+        return hash((tuple(sorted([i for i in self.pieces.items()])), \
                      self.height, self.width))
     
     def __repr__(self):

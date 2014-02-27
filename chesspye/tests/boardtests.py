@@ -216,6 +216,90 @@ class TestBoardEqualityAndHashing(unittest.TestCase):
         
         self.assertEqual(self.board1, self.board2, 'Boards are set up the same')
         
+    def testSameMemoryObjectMultiplePiecesBoardEquality(self):
+        self.board1 = ClassicBoard()
+        self.board2 = ClassicBoard()
+        self.board1.clear_board()
+        self.board2.clear_board()
+        
+        white_rook = Rook(colors.WHITE)
+        white_queen = Queen(colors.WHITE)
+        black_pawn = Pawn(colors.BLACK)
+        self.board1.set_square_to_piece('h1', white_rook)
+        self.board1.set_square_to_piece('c3', white_queen)
+        self.board1.set_square_to_piece('e7', black_pawn)
+        self.board2.set_square_to_piece('h1', white_rook)
+        self.board2.set_square_to_piece('c3', white_queen)
+        self.board2.set_square_to_piece('e7', black_pawn)
+        
+        self.assertEqual(self.board1, self.board2, 'Boards are set up the same')
+        
+    def testDifferentMemoryObjectMultiplePiecesBoardEquality(self):
+        self.board1 = ClassicBoard()
+        self.board2 = ClassicBoard()
+        self.board1.clear_board()
+        self.board2.clear_board()
+        
+        white_rook1 = Rook(colors.WHITE)
+        white_rook2 = Rook(colors.WHITE)
+        white_queen1 = Queen(colors.WHITE)
+        white_queen2 = Queen(colors.WHITE)
+        black_pawn1 = Pawn(colors.BLACK)
+        black_pawn2 = Pawn(colors.BLACK)
+        self.board1.set_square_to_piece('h1', white_rook1)
+        self.board1.set_square_to_piece('c3', white_queen1)
+        self.board1.set_square_to_piece('e7', black_pawn1)
+        self.board2.set_square_to_piece('h1', white_rook2)
+        self.board2.set_square_to_piece('c3', white_queen2)
+        self.board2.set_square_to_piece('e7', black_pawn2)
+        
+        self.assertEqual(self.board1, self.board2, 'Boards are set up the same')
+        
+    def testSameMemoryObjectMultiplePiecesBoardEqualityModify(self):
+        self.board1 = ClassicBoard()
+        self.board2 = ClassicBoard()
+        self.board1.clear_board()
+        self.board2.clear_board()
+        
+        white_rook = Rook(colors.WHITE)
+        white_queen = Queen(colors.WHITE)
+        black_pawn = Pawn(colors.BLACK)
+        self.board1.set_square_to_piece('h1', white_rook)
+        self.board1.set_square_to_piece('c3', white_queen)
+        self.board2.set_square_to_piece('h1', white_rook)
+        self.board2.set_square_to_piece('c3', white_queen)
+        
+        self.assertEqual(self.board1, self.board2, 'Boards are set up the same')
+        
+        self.board1.set_square_to_piece('e7', black_pawn)
+        self.board2.set_square_to_piece('e7', black_pawn)
+        
+        self.assertEqual(self.board1, self.board2, 'Boards are set up the same')
+        
+    def testDifferentMemoryObjectMultiplePiecesBoardEqualityModify(self):
+        self.board1 = ClassicBoard()
+        self.board2 = ClassicBoard()
+        self.board1.clear_board()
+        self.board2.clear_board()
+        
+        white_rook1 = Rook(colors.WHITE)
+        white_rook2 = Rook(colors.WHITE)
+        white_queen1 = Queen(colors.WHITE)
+        white_queen2 = Queen(colors.WHITE)
+        black_pawn1 = Pawn(colors.BLACK)
+        black_pawn2 = Pawn(colors.BLACK)
+        self.board1.set_square_to_piece('h1', white_rook1)
+        self.board1.set_square_to_piece('c3', white_queen1)
+        self.board2.set_square_to_piece('h1', white_rook2)
+        self.board2.set_square_to_piece('c3', white_queen2)
+        
+        self.assertEqual(self.board1, self.board2, 'Boards are set up the same')
+        
+        self.board1.set_square_to_piece('e7', black_pawn1)
+        self.board2.set_square_to_piece('e7', black_pawn2)
+        
+        self.assertEqual(self.board1, self.board2, 'Boards are set up the same')
+        
     def testDifferentSizedBoardsAreNotEqual(self):
         self.board1 = Board(8,8)
         self.board2 = Board(9,9)
