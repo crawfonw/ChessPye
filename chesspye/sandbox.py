@@ -9,6 +9,6 @@ from chesspye.interfaces.cli import CLI
 from chesspye.players.players import HumanPlayer
 
 if __name__ == '__main__':
-    g = VanillaChess(HumanPlayer(colors.WHITE), HumanPlayer(colors.BLACK), CLI())
+    g = VanillaChess(HumanPlayer('White', colors.WHITE), HumanPlayer('Black', colors.BLACK), CLI())
     g.board.pretty_print = False
     g.play_game()

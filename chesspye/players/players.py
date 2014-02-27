@@ -10,11 +10,12 @@ player_types = enum(HUMAN=0, AI=1)
 
 class Player(object):
     
-    def __init__(self, type, color):
+    def __init__(self, name, type, color):
+        self.name = name
         self.type = type
         self.color = color
         
 class HumanPlayer(Player):
     
-    def __init__(self, color):
-        super(HumanPlayer, self).__init__(player_types.HUMAN, color)
+    def __init__(self, name, color):
+        super(HumanPlayer, self).__init__(name, player_types.HUMAN, color)

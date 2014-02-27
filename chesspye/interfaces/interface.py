@@ -12,8 +12,11 @@ class Interface(object):
     def offer_move(self, player):
         raise NotImplementedError()
     
-    def draw_update(self, board):
+    def draw_board_update(self, board):
         raise NotImplementedError()
     
     def display_message(self, message):
+        raise NotImplementedError()
+    
+    def display_alert(self, message):
         raise NotImplementedError()

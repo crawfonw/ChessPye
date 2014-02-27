@@ -58,7 +58,7 @@ class VanillaChess(object):
     
     def play_game(self):
         while True:
-            self.interface.draw_update(self.board)
+            self.interface.draw_board_update(self.board)
             move = self.interface.offer_move(self.active_player())
             if isinstance(move, str):
                 from_sq, to_sq = move.split('-')
@@ -73,6 +73,8 @@ class VanillaChess(object):
                     break
                 else:
                     self.next_player()
+            else:
+                self.interface.display_message('Invalid move')
         return self.active_player()
 
 ''' This will probably be moved to an AI player since they would only use this...

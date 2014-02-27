@@ -31,12 +31,10 @@ class ChessPiece(object):
     
     def __str__(self):
         #temp
-        ret = ''
+        ret = self.algebraic
         if self.color == colors.BLACK:
-            ret = '-'
-        elif self.color == colors.WHITE:
-            ret = '+'
-        return '%s%s' % (ret, self.algebraic)
+            ret = ret.lower()
+        return ret
     
     def __repr__(self):
         return '%s(long_name=%s, color=%s, piece_type=%s, value=%s, utf_code_white=%s, algebraic=%s, times_moved=%s)' \
@@ -72,7 +70,7 @@ class ChessPiece(object):
 
 class Pawn(ChessPiece):
     def __init__(self, color, times_moved=0):
-        super(Pawn, self).__init__('Pawn', color, piece_types.PAWN, 1, 9817, '', times_moved, move_types.EXACT)
+        super(Pawn, self).__init__('Pawn', color, piece_types.PAWN, 1, 9817, 'P', times_moved, move_types.EXACT)
         
     def move_patterns(self):
         if not self.has_moved():
