@@ -7,22 +7,39 @@ import unittest
 
 from chesspye.game.games import VanillaChess
 
-class TestGame(unittest.TestCase):
-
+class TestEndgameChecking(unittest.TestCase):
+    
     def setUp(self):
-        self.game = VanillaChess(None,None)
+        self.game = VanillaChess(None, None, None)
         self.game.board.clear_board()
+        
+        self.game.board.set_square_to_piece('e1', King(colors.WHITE))
+        self.game.board.set_square_to_piece('h1', Rook(colors.WHITE))
+        self.game.board.set_square_to_piece('a1', Rook(colors.WHITE))
 
     def tearDown(self):
         pass
     
-    def testKingIsInCheckmate(self):
-        self.board.set_square_to_piece('f1', King(colors.WHITE))
-        self.board.kings[colors.WHITE] = self.board.algebraic_to_coordinate_square('f1')
-        self.board.set_square_to_piece('h1', Rook(colors.BLACK))
-        self.board.set_square_to_piece('a2', Rook(colors.BLACK))
-        
-        self.assertTrue(self.game.is_checkmate(colors.WHITE), 'King cannot move, block, nor take out of check')
+    def testIsThreeMoveRepetitionAfterThreeConsecutiveMoves(self):
+        pass
+
+    def testIsThreeMoveRepetitionAfterThreeNonconsecutiveMoves(self):
+        pass
+    
+    def testIsNotThreeMoveRepetition(self):
+        pass
+    
+    def testIsNotThreeMoveDueToKingsideCastleWhite(self):
+        pass
+    
+    def testIsNotThreeMoveDueToKingsideCastleBlack(self):
+        pass
+    
+    def testIsNotThreeMoveDueToQueensideCastleWhite(self):
+        pass
+    
+    def testIsNotThreeMoveDueToQueensideCastleBlack(self):
+        pass
 
 if __name__ == "__main__":
     unittest.main()

@@ -13,6 +13,7 @@ class VanillaChess(object):
     def __init__(self, white_player, black_player, interface):
         self.board = ClassicBoard()
         self.rules = VanillaRules()
+        self.positions = {}
         self.interface = interface
         self.white_player = white_player
         self.black_player = black_player
@@ -32,6 +33,12 @@ class VanillaChess(object):
     
     def dispatch_promotion_choice(self):
         return interface.promote()
+    
+    def update_position_dict(self):
+        try:
+            self.positions[self.board] += 1
+        except KeyError:
+            self.positions[self.board] = 1
     
     def check_for_endgame(self, color):
         result = self.rules.is_game_over(color)

@@ -191,8 +191,15 @@ class VanillaRules(Rules):
     def is_fifty_move(self):
         return self.game_variables['fifty_move_counter'] >= 100
     
-    def is_threefold_repetition(self): #might need to do some fun hash stuff here
-        pass
+    def is_threefold_repetition(self, board, positions):
+        try:
+            if positions[board] < 3:
+                return False
+            else:
+                return True
+        except KeyError:
+            positions[board] = 1
+            return False
     
     #Movement/board state validators
     def is_valid_move(self, from_sq, to_sq, board):

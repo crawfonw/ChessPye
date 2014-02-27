@@ -1635,15 +1635,37 @@ class TestCheckmateRules(unittest.TestCase):
         
         self.assertFalse(self.rules.can_a_piece_block_or_take_check(colors.WHITE, self.board), 'White cannot block with either rook')
 
-class TestThreeMoveRepetitionRule(unittest.TestCase):
+class TestThreeMoveRepetitionChecking(unittest.TestCase):
     
     def setUp(self):
         self.rules = VanillaRules()
         self.board = ClassicBoard()
         self.board.clear_board()
+        self.d = {}
+        
+        self.board.set_square_to_piece('e1', King(colors.WHITE))
+        self.board.set_square_to_piece('h1', Rook(colors.WHITE))
+        self.board.set_square_to_piece('a1', Rook(colors.WHITE))
+        self.board.set_square_to_piece('e8', King(colors.BLACK))
+        self.board.set_square_to_piece('e7', King(colors.BLACK))
 
     def tearDown(self):
         pass
+    
+    def testIsThreeMoveRepetitionAfterThreeInstances(self):
+        self.assertFalse(self.rules.is_threefold_repetition(self.board, self.d), 'No instances of this position')
+        self.d[self.board] = 1
+        self.assertFalse(self.rules.is_threefold_repetition(self.board, self.d), 'One instance of this position')
+        self.d[self.board] = 2
+        self.assertFalse(self.rules.is_threefold_repetition(self.board, self.d), 'Two instances of this position')
+        self.d[self.board] = 3
+        self.assertTrue(self.rules.is_threefold_repetition(self.board, self.d), 'Three instances of this position')
+    
+    def testIsNotThreeMoveRepetition(self):
+        self.assertFalse(self.rules.is_threefold_repetition(self.board, self.d), 'No instances of this position')
+        self.d[self.board] = 1
+        self.rules.move_piece('e1', 'e2', self.board)
+        self.assertFalse(self.rules.is_threefold_repetition(self.board, self.d), 'Noe instances of this position')
 
 if __name__ == "__main__":
     unittest.main()
