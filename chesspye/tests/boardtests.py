@@ -5,8 +5,8 @@ Created on Jun 22, 2013
 '''
 import unittest
 
-from chesspye.board.boards import Board, ClassicBoard
-from chesspye.board.pieces import colors, Pawn, King, Queen, Knight, Bishop, Rook
+from chesspye.boards import Board, ClassicBoard
+from chesspye.pieces import colors, Pawn, King, Queen, Knight, Bishop, Rook
 
 class TestGenericBoardCreation(unittest.TestCase):
 

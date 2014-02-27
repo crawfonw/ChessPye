@@ -5,10 +5,10 @@ Created on Jun 22, 2013
 '''
 import unittest
 
-from chesspye.board.boards import ClassicBoard
-from chesspye.board.pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors, piece_types
-from chesspye.game.games import VanillaChess
-from chesspye.game.rules import VanillaRules
+from chesspye.boards import ClassicBoard
+from chesspye.games import VanillaChess
+from chesspye.pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors, piece_types
+from chesspye.rules import VanillaRules
 from chesspye.utils import Stack
 
 class TestPieceMovement(unittest.TestCase):

@@ -15,23 +15,13 @@ Note on the move_rules dict:
     rules class if you want them to interact with game_variables (duh)
 '''
 
-from chesspye.board.pieces import colors, move_types, piece_types, Pawn
+from Rules import Rules
+
+from chesspye.pieces import colors, move_types, piece_types, Pawn
 from chesspye.utils import Vec2d
 
 from copy import deepcopy
 from math import copysign
-
-class Rules(object):
-    
-    def __init__(self):
-        self.move_rules_and_actions = {}
-        self.game_variables = {}
-        
-    def register_move_rule_handler_pair(self, rule, handler):
-        self.move_rules_and_actions[rule] = handler
-            
-    def register_game_variable(self, name, val):
-        self.game_variables[name] = val
 
 class VanillaRules(Rules):
 

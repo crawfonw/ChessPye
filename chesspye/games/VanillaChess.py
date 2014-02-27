@@ -4,9 +4,9 @@ Created on Jun 20, 2013
 @author: nick
 '''
 
-from chesspye.board.boards import ClassicBoard
-from chesspye.board.pieces import piece_types, colors
-from rules import VanillaRules
+from chesspye.boards import ClassicBoard
+from chesspye.pieces import piece_types, colors
+from chesspye.rules import VanillaRules
 
 class VanillaChess(object):
 

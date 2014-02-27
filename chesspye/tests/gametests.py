@@ -5,7 +5,8 @@ Created on Jun 22, 2013
 '''
 import unittest
 
-from chesspye.game.games import VanillaChess
+from chesspye.games import VanillaChess
+from chesspye.pieces import King, Rook, colors
 
 class TestEndgameChecking(unittest.TestCase):
     
