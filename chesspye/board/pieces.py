@@ -30,7 +30,13 @@ class ChessPiece(object):
             return unichr(self.utf_code_white + 6)
     
     def __str__(self):
-        return self.algebraic
+        #temp
+        ret = ''
+        if self.color == colors.BLACK:
+            ret = '-'
+        elif self.color == colors.WHITE:
+            ret = '+'
+        return '%s%s' % (ret, self.algebraic)
     
     def __repr__(self):
         return '%s(long_name=%s, color=%s, piece_type=%s, value=%s, utf_code_white=%s, algebraic=%s, times_moved=%s)' \
@@ -53,10 +59,10 @@ class ChessPiece(object):
             Returns a list of tuples with xy modifier coordinates of how
             this piece moves.
         '''
-        return
+        raise NotImplementedError()
     
     def attack_patterns(self):
-        return
+        raise NotImplementedError()
     
     def all_patterns(self):
         return set(self.move_patterns()).union(set(self.attack_patterns()))

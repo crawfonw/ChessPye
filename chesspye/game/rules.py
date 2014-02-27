@@ -64,9 +64,11 @@ class VanillaRules(Rules):
                     return True
                 return False
             else:
-                raise TypeError("Invalid square specification data type %s" % type(from_sq))
+                return False
+                #raise TypeError("Invalid square specification data type %s" % type(from_sq))
         else:
-            raise TypeError("from_sq and to_sq datatypes must match! (Inputs were %s and %s.)" % (type(from_sq), type(to_sq)))
+            return False
+            #raise TypeError("from_sq and to_sq datatypes must match! (Inputs were %s and %s.)" % (type(from_sq), type(to_sq)))
     
     def move_piece_algebraic(self, from_sq, to_sq, board):
         #i.e. d1-d4 not Qd4
@@ -83,10 +85,10 @@ class VanillaRules(Rules):
             return False
     
     #Endgame checks, called from game object
-    def is_game_over(self, color, board): #color: is this color check/stalemated?
+    def is_game_over(self, color, board, positions): #color: is this color check/stalemated?
         if self.is_fifty_move():
             return 'draw (50 move)'
-        elif self.is_threefold_repeition():
+        elif self.is_threefold_repetition(board, positions):
             return 'draw (3-move rep)'
         elif self.is_checkmate(color, board):
             return 'checkmate'
