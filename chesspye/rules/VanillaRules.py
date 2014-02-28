@@ -17,8 +17,8 @@ Note on the move_rules dict:
 
 from Rules import Rules
 
-from chesspye.pieces import colors, move_types, piece_types, Pawn
-from chesspye.utils import Vec2d
+from pieces import colors, move_types, piece_types, Pawn
+from utils import Vec2d
 
 from copy import deepcopy
 from math import copysign

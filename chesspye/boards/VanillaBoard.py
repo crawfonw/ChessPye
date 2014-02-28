@@ -6,8 +6,8 @@ Created on Jun 20, 2013
 
 from Board import Board
 
-from chesspye.pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors, piece_types
-from chesspye.utils import ctl, letter_to_number, Stack
+from pieces import Pawn, Knight, Bishop, Rook, Queen, King, colors, piece_types
+from utils import ctl, letter_to_number, Stack
 
 class VanillaBoard(Board):
     

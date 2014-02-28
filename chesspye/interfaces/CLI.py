@@ -4,8 +4,8 @@ Created on Feb 27, 2014
 @author: Nick Crawford
 '''
 
-from chesspye.interfaces import Interface
-from chesspye.players import player_types
+from interfaces import Interface
+from players import player_types
 
 class CLI(Interface):
     

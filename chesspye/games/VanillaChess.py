@@ -4,10 +4,10 @@ Created on Jun 20, 2013
 @author: nick
 '''
 
-from chesspye.boards import ClassicBoard
-from chesspye.pieces import piece_types, colors
-from chesspye.players import player_types
-from chesspye.rules import VanillaRules
+from boards import ClassicBoard
+from pieces import piece_types, colors
+from players import player_types
+from rules import VanillaRules
 
 class VanillaChess(object):
 

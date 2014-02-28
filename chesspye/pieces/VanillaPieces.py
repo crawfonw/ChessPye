@@ -4,8 +4,8 @@ Created on Jun 21, 2013
 @author: nick
 '''
 
-from chesspye.pieces import ChessPiece, colors, piece_types, move_types
-from chesspye.utils import enum, scalar_mult_tuple
+from pieces import ChessPiece, colors, piece_types, move_types
+from utils import enum, scalar_mult_tuple
 
 class Pawn(ChessPiece):
     def __init__(self, color, times_moved=0):

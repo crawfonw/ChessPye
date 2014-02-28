@@ -4,8 +4,8 @@ Created on Jun 21, 2013
 @author: nick
 '''
 
-from chesspye.pieces import colors
-from chesspye.utils import enum, scalar_mult_tuple
+from pieces import colors
+from utils import enum, scalar_mult_tuple
 
 class ChessPiece(object):
     
