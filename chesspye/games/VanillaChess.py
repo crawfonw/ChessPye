@@ -77,7 +77,6 @@ class VanillaChess(object):
                 from_sq, to_sq = move
             else:
                 from_sq, to_sq = (None, None)
-            
             is_valid = self.rules.move_piece(from_sq, to_sq, self.board)
             if is_valid:
                 self.end_of_turn_cleanup()

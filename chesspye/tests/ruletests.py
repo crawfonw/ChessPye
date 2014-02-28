@@ -725,6 +725,16 @@ class TestCastlingRules(unittest.TestCase):
     def tearDown(self):
         pass
     
+    def testForGithubIssue7(self):
+        board = ClassicBoard()
+        self.rules.move_piece('g1', 'f3', board)
+        self.rules.move_piece('e7', 'e6', board)
+        self.rules.move_piece('g2', 'g3', board)
+        self.rules.move_piece('d7', 'd6', board)
+        self.rules.move_piece('f1', 'g2', board)
+        self.rules.move_piece('d6', 'd5', board)
+        self.assertTrue(self.rules.move_piece('e1', 'g1', board))
+    
     def testCastleVariablesAreSetCorrectlyWhenWhiteKingMoves(self):
         self.board.set_square_to_piece('e1', King(colors.WHITE))
         
