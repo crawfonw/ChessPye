@@ -7,11 +7,13 @@ import unittest
 
 from games import VanillaChess
 from pieces import King, Rook, colors
+from players import Player
 
 class TestEndgameChecking(unittest.TestCase):
     
     def setUp(self):
-        self.game = VanillaChess(None, None, None)
+        nil_player = Player(None, None, None)
+        self.game = VanillaChess(nil_player, nil_player, None)
         self.game.board.clear_board()
         
         self.game.board.set_square_to_piece('e1', King(colors.WHITE))

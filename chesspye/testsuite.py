@@ -6,9 +6,9 @@ Created on Jun 22, 2013
 
 import unittest
 
-from boardtests import *
-from gametests import *
-from ruletests import *
+from tests.boardtests import *
+from tests.gametests import *
+from tests.ruletests import *
 
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=1).run()
