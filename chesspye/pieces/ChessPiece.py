@@ -9,7 +9,7 @@ from utils import enum, scalar_mult_tuple
 
 class ChessPiece(object):
     
-    def __init__(self, long_name, color, piece_type, value, utf_code_white, algebraic, times_moved, move_type, can_jump=False):
+    def __init__(self, long_name, color, piece_type, value, utf_code_white, algebraic, times_moved, move_type, sprite_file, can_jump=False):
         self.long_name = long_name
         self.color = color
         self.piece_type = piece_type
@@ -19,6 +19,7 @@ class ChessPiece(object):
         self.times_moved = times_moved
         self.move_type = move_type
         self.can_jump = can_jump
+        self.sprite_file = sprite_file
 
     def __unicode__(self):
         if self.color == colors.WHITE:
@@ -48,6 +49,9 @@ class ChessPiece(object):
             return self.piece_type == o.piece_type
         else:
             return False
+    
+    def sprite_region(self):
+        raise NotImplementedError()
     
     def move_patterns(self):
         '''
