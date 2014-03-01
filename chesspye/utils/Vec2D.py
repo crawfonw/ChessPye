@@ -1,60 +1,5 @@
-'''
-Created on Jun 22, 2013
-
-@author: nick
-
-'''
-
 import math
 import operator
-import pgn
-
-def enum(**enums):
-    return type('Enum', (), enums)
-
-def ctl(i):
-    return chr(97 + i)
-
-def letter_to_number(s):
-    return ord(s) - 97
-    
-def scalar_mult_tuple(alpha, tup):
-    return tuple(alpha*i for i in tup)
-    
-def get_list_of_moves_from_pgn(pgn_path): #includes comments & W/L/D result
-    pgn_text = open(pgn_path).read()
-    pgn_games = pgn.loads(pgn_text)
-    return [game.moves for game in pgn_games]
-        
-class Stack(object):
-    
-    def __init__(self, initial_set=[]):
-        if isinstance(initial_set, list):
-            self.objs = initial_set
-        else:
-            self.objs = [initial_set]
-        
-    def push(self, obj):
-        self.objs.append(obj)
-        
-    def pop(self):
-        return self.objs.pop()
-    
-    def peek(self):
-        if not self.is_empty():
-            return self.objs[-1]
-        
-    def is_empty(self):
-        return len(self.objs) == 0
-    
-    def __repr__(self):
-        return '%s(initial_set=%s)' % (self.__class__.__name__, self.objs)
-    
-    def __str__(self):
-        return str(self.objs)
-    
-    def __iter__(self):
-        return iter(self.objs)
 
 ################## http://www.pygame.org/wiki/2DVectorClass ################## 
 class Vec2d(object):
@@ -242,9 +187,9 @@ class Vec2d(object):
         return self._r_o2(other, operator.mod)
  
     def __divmod__(self, other):
-        return self._o2(other, operator.divmod)
+        return self._o2(other, operator.divmod)  # @UndefinedVariable
     def __rdivmod__(self, other):
-        return self._r_o2(other, operator.divmod)
+        return self._r_o2(other, operator.divmod)  # @UndefinedVariable
  
     # Exponentation
     def __pow__(self, other):
