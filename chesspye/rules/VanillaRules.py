@@ -212,9 +212,9 @@ class VanillaRules(Rules):
             if rule_data is None:
                 return None
             board_copy = deepcopy(board)
-            move_count = self.game_variables['fifty_move_counter'] 
+            var_copy = deepcopy(self.game_variables) 
             self.move_rules_and_actions[rule](rule_data, board_copy)
-            self.game_variables['fifty_move_counter'] = move_count
+            self.game_variables = var_copy
             if self.is_king_in_check(piece.color, board_copy):
                 del board_copy
                 return None

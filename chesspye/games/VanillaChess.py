@@ -88,6 +88,7 @@ class VanillaChess(object):
             else:
                 self.interface.display_message('Invalid move')
             self.interface.draw_board_update(self.board)
+            print self.rules.game_variables
         print 'Game over! %s' % is_end
         return self.active_player()
 
