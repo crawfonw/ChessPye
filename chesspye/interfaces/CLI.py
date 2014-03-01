@@ -12,6 +12,9 @@ class CLI(Interface):
     def __init__(self):
         super(CLI, self).__init__()
         
+    def setup(self, game_instance):
+        pass
+        
     def display_message(self, message):
         print message
         

@@ -12,6 +12,7 @@ from rules import VanillaRules
 class VanillaChess(object):
 
     def __init__(self, white_player, black_player, interface):
+        self.name = 'Classic Chess'
         self.board = ClassicBoard()
         self.rules = VanillaRules()
         self.positions = {}
@@ -22,6 +23,8 @@ class VanillaChess(object):
         for player in self.players:
             if player.type == player_types.AI:
                 player.register_game(self) #might be bad
+                
+        self.interface.setup(self)
         
     def __repr__(self):
         return 'VanillaChess(white_player=%r, black_player=%r)' % (self.white_player, self.black_player)

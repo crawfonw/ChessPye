@@ -6,3 +6,4 @@ Created on Feb 27, 2014
 
 from Interface import Interface
 from CLI import CLI
+from GUI import GUI

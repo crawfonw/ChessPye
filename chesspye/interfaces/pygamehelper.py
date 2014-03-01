@@ -23,7 +23,7 @@ def drawGraph(screen, arr, step=5):
             pygame.draw.line(screen, (0,0,0), p1, p2)
         
 class PygameHelper:
-    def __init__(self, size=(640,480), fill=(255,255,255)):
+    def __init__(self, size=(640,640), fill=(255,255,255), title='PyGame'):
         pygame.init()
         self.screen = pygame.display.set_mode(size)
         self.screen.fill(fill)
@@ -31,7 +31,8 @@ class PygameHelper:
         self.running = False
         self.clock = pygame.time.Clock() #to track FPS
         self.size = size
-        self.fps= 0
+        self.fps = 0
+        self.title = title
         
     def handleEvents(self):
         for event in pygame.event.get():
@@ -62,7 +63,7 @@ class PygameHelper:
         self.fps= fps
         
         while self.running:
-            pygame.display.set_caption("FPS: %i" % self.clock.get_fps())
+            pygame.display.set_caption("%s: (fps: %i)" % (self.title, self.clock.get_fps()))
             self.handleEvents()
             self.update()
             self.draw()

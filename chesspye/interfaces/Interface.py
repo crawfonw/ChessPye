@@ -20,3 +20,6 @@ class Interface(object):
     
     def display_alert(self, message):
         raise NotImplementedError()
+    
+    def setup(self, game_instance):
+        raise NotImplementedError()
