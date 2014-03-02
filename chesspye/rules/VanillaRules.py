@@ -118,12 +118,15 @@ class VanillaRules(Rules):
             return False
     
     def can_king_move(self, color, board):
-        loc = board.kings[color]
-        king = board.pieces[loc]
-        for move in king.attack_patterns(): #maybe use all_patterns() to support variants with odd pieces
-            square = tuple(Vec2d(loc) + Vec2d(move))
-            if self.is_valid_move(loc, square, board):
-                return True
+        try:
+            loc = board.kings[color]
+            king = board.pieces[loc]
+            for move in king.attack_patterns(): #maybe use all_patterns() to support variants with odd pieces
+                square = tuple(Vec2d(loc) + Vec2d(move))
+                if self.is_valid_move(loc, square, board):
+                    return True
+        except:
+            return True
             
     def can_other_piece_move(self, color, board):
         for loc, piece in board.get_pieces_for_color(color):
@@ -160,6 +163,7 @@ class VanillaRules(Rules):
                             return True
         return False
     
+    #TODO: verify that this actually does what it is intended to
     def generate_all_valid_target_squares_for_attack_vector(self, from_sq, piece, av, board):
         valid_squares = []
         if piece.move_type == move_types.MAX:
@@ -175,10 +179,29 @@ class VanillaRules(Rules):
                 valid_squares.append(curr_square)
                 curr_square = tuple(Vec2d(curr_square) + av)
         else:
-            for move in piece.attack_patterns():
-                curr_square = tuple(Vec2d(from_sq) + av)
-                valid_squares.append(curr_square)
+            #for move in piece.attack_patterns(): #TODO: what am I doing here?
+            #    curr_square = tuple(Vec2d(from_sq) + av)
+            #    valid_squares.append(curr_square)
+            curr_square = tuple(Vec2d(from_sq) + av)
+            valid_squares.append(curr_square)
         return valid_squares
+    
+    def generate_all_valid_target_squares_for_vector(self, from_sq, piece, vec, board):
+        valid_squares = []
+        if piece.move_type == move_types.EXACT:
+            return [tuple(Vec2d(from_sq) + vec)]
+        else:
+            curr_square = tuple(Vec2d(from_sq) + vec)
+            while True:
+                if not board.square_is_on_board(curr_square):
+                    break
+                if board.pieces[curr_square] is not None and not piece.can_jump:
+                    valid_squares.append(curr_square)
+                    break
+                valid_squares.append(curr_square)
+                curr_square = tuple(Vec2d(curr_square) + vec)
+        return valid_squares
+            
     
     def is_fifty_move(self):
         return self.game_variables['fifty_move_counter'] >= 100
@@ -236,9 +259,12 @@ class VanillaRules(Rules):
         return False
     
     def is_king_in_check(self, color, board):
-        if board.kings[color] is None: #for testing or variants
-            return False
-        return self.is_square_guarded_by(board.kings[color], color * -1, board)
+        try:
+            if board.kings[color] is None: #for testing or variants
+                return False
+            return self.is_square_guarded_by(board.kings[color], color * -1, board)
+        except:
+            pass
 
     #Movement rules
     def generic_move_rule(self, from_sq, to_sq, move_vector, piece, board):

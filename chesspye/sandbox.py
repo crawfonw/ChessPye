@@ -4,13 +4,17 @@ Created on Jun 21, 2013
 @author: nick
 '''
 from pieces import colors
+from boards import SmallTestBoard
 from games import VanillaChess
 from interfaces import CLI, GUI
-from players import HumanPlayer, RandomAI
+from players import HumanPlayer, RandomAI, HalfLookAI, NegamaxAI
 
 if __name__ == '__main__':
     #game = VanillaChess(HumanPlayer('White', colors.WHITE), HumanPlayer('Black', colors.BLACK))
-    game = VanillaChess(HumanPlayer('White', colors.WHITE), RandomAI('Black', colors.BLACK))
+    #game = VanillaChess(HumanPlayer('White', colors.WHITE), RandomAI('Black', colors.BLACK))
+    game = VanillaChess(HumanPlayer('White', colors.WHITE), NegamaxAI('Black', colors.BLACK))
+    #game = VanillaChess(HumanPlayer('Black', colors.BLACK), NegamaxAI('White', colors.WHITE))
+    game.board = SmallTestBoard()
     game.board.pretty_print = False
     #interface = CLI(game)
     interface = GUI(game)

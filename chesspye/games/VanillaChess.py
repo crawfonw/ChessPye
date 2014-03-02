@@ -97,17 +97,3 @@ class VanillaChess(object):
                 if last_move[2][0] == 0:
                     self.board.pieces[last_move[2]] = vanilla_type_to_obj(choice, last_move[0].color)
                     self.board.moves.push((self.board.pieces[last_move[2]], last_move[1], last_move[2]))
-
-''' This will probably be moved to an AI player since they would only use this...
-    def score_board(self):
-        if self.is_king_in_checkmate(colors.WHITE):
-            return float('inf')
-        elif self.is_king_in_checkmate(colors.BLACK):
-            return float('-inf')
-        else:
-            score = 0
-            for piece in self.board.pieces.itervalues():
-                if piece is not None:
-                    score += piece.color * piece.value
-        return score 
-'''

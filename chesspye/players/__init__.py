@@ -8,3 +8,5 @@ from Enums import player_types
 from Player import Player
 from HumanPlayer import HumanPlayer
 from RandomAI import RandomAI
+from HalfLookAI import HalfLookAI
+from NegamaxAI import NegamaxAI

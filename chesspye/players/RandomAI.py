@@ -10,7 +10,6 @@ That's all.
 from random import choice, shuffle
 
 from pieces import piece_types
-from Enums import player_types
 from AIPlayer import AIPlayer
         
 class RandomAI(AIPlayer):
