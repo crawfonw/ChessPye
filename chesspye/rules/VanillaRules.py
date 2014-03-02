@@ -76,16 +76,36 @@ class VanillaRules(Rules):
     
     #Endgame checks, called from game object
     def is_game_over(self, color, board, positions): #color: is this color check/stalemated?
-        if self.is_fifty_move():
-            return 'draw (50 move)'
-        elif self.is_threefold_repetition(board, positions):
-            return 'draw (3-move rep)'
+        is_draw = self.is_draw(board, positions)
+        if is_draw:
+            return is_draw
         elif self.is_checkmate(color, board):
-            return 'checkmate'
-        elif self.is_stalemate(color, board):
-            return 'draw (stalemate)'
+            return '%s is checkmate' % color
         else:
             return ''
+        
+    def is_draw(self, board, positions):
+        if self.is_fifty_move():
+            return 'draw (50 move)'
+        elif self.two_kings(board):
+            return 'draw'
+        elif self.is_threefold_repetition(board, positions):
+            return 'draw (3-move rep)'
+        elif self.is_stalemate(colors.WHITE, board):
+            return 'draw (white stalemate)'
+        elif self.is_stalemate(colors.BLACK, board):
+            return 'draw (black stalemate)'
+        else:
+            return ''
+        
+    def two_kings(self, board):
+        count = 0
+        for piece in board.pieces.values():
+            if piece is not None:
+                count += 1
+                if count > 2:
+                    return False
+        return True
     
     def is_stalemate(self, color, board):
         if self.can_king_move(color, board):
@@ -133,7 +153,7 @@ class VanillaRules(Rules):
             if piece.piece_type != piece_types.KING:
                 for move in piece.all_patterns():
                     square = tuple(Vec2d(loc) + Vec2d(move))
-                    if self.is_valid_move(loc, square, board):
+                    if self.is_valid_move(loc, square, board, True):
                         return True
     
     #this is getting out of hand
@@ -213,11 +233,10 @@ class VanillaRules(Rules):
             else:
                 return True
         except KeyError:
-            positions[board] = 1
             return False
     
     #Movement/board state validators
-    def is_valid_move(self, from_sq, to_sq, board):
+    def is_valid_move(self, from_sq, to_sq, board, ignore_king=False):
         if from_sq == to_sq:
             return None
         if not board.square_is_on_board(from_sq) or \
@@ -238,9 +257,10 @@ class VanillaRules(Rules):
             var_copy = deepcopy(self.game_variables) 
             self.move_rules_and_actions[rule](rule_data, board_copy)
             self.game_variables = var_copy
-            if self.is_king_in_check(piece.color, board_copy):
-                del board_copy
-                return None
+            if not ignore_king:
+                if self.is_king_in_check(piece.color, board_copy):
+                    del board_copy
+                    return None
             
             del board_copy
             return (rule, rule_data)

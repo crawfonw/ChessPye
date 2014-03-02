@@ -3,12 +3,23 @@ Created on Jun 22, 2013
 
 @author: nick
 '''
-
+import inspect
+import sys
 import unittest
 
-from tests.boardtests import *
-from tests.gametests import *
-from tests.ruletests import *
+import tests
 
 if __name__ == '__main__':
-    unittest.TextTestRunner(verbosity=1).run()
+    test_classes = []
+    
+    for i in inspect.getmembers(sys.modules[tests.boardtests.__name__], inspect.isclass):
+        test_classes.append(i[1])
+    for i in inspect.getmembers(sys.modules[tests.gametests.__name__], inspect.isclass):
+        test_classes.append(i[1])
+    for i in inspect.getmembers(sys.modules[tests.ruletests.__name__], inspect.isclass):
+        test_classes.append(i[1])
+    
+    suites = map(unittest.TestLoader().loadTestsFromTestCase, test_classes)
+    alltests = unittest.TestSuite(suites)
+    unittest.TextTestRunner(verbosity=1).run(alltests)
+    #unittest.TextTestRunner(verbosity=1).run()

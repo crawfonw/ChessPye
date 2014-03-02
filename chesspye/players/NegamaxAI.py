@@ -20,11 +20,12 @@ class NegamaxAI(AIPlayer):
         super(NegamaxAI, self).__init__(name, color)
 
     def score_board(self, board):
+        positions = deepcopy(self.game.positions)
         if self.game.rules.is_checkmate(colors.WHITE, board):
             return float('inf')
         elif self.game.rules.is_checkmate(colors.BLACK, board):
             return float('-inf')
-        elif self.game.rules.is_stalemate(colors.WHITE, board) or self.game.rules.is_stalemate(colors.BLACK, board):
+        elif self.game.rules.is_draw(board, positions):
             return 0
         else:
             score = 0
@@ -32,34 +33,32 @@ class NegamaxAI(AIPlayer):
                 if piece is not None:
                     score += piece.color * piece.value
         return score
-        
+    
     def move(self):
+        return self.minimax_move()
+        #return self.negamax_move()
+        
+    def minimax_move(self):
         node = BoardTreeNode(self.game.board, self.game.rules, None)
         action_values = {}
         actions = node.generate_children(self.color)
-        for action in actions:
-            print 'Applying minimax to move %s (for color %s): %s' % (action.move, -self.color, action.board)
-            av = minimax(action, 2, -self.color, self.score_board)[0]
-            print av, action.move
-            print
+        for i, action in enumerate(actions):
+            av = minimax(action, 1, -self.color, self.score_board)[0]
             action_values[av] = action.move
-            #action_values.append((av, action.move))
-        print action_values
+            print 'Subtree for %s move(s) evaluated.' % (i+1)
         if self.color == colors.WHITE:
             return action_values[max(action_values)]
         else:
             return action_values[min(action_values)]
         
-    def move1(self):
+    def negamax_move(self):
         node = BoardTreeNode(self.game.board, self.game.rules, None)
         action_values = {}
         actions = node.generate_children(self.color)
-        for action in actions:
-            av = self.color * negamax(action, 2, self.color, self.score_board)[0]
-            print av, action.move
+        for i, action in enumerate(actions):
+            av = negamax(action, 1, -self.color, self.score_board)[0]
             action_values[av] = action.move
-            #action_values.append((av, action.move))
-        print action_values
+            print 'Subtree for %s move(s) evaluated.' % (i+1)
         if self.color == colors.WHITE:
             return action_values[max(action_values)]
         else:
