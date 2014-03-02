@@ -27,8 +27,12 @@ def minimax(node, depth, color, scoring_f):
 
 def negamax(node, depth, color, scoring_f):
     if depth == 0:
+        print 'Evaluating %s for board %s' % (node.move, node.board)
+        score = scoring_f(node.board) * color
+        print 'Score (color=%s): %s' % (color, score)
         return scoring_f(node.board) * color, node.move
     best = [(float('-inf'), None)]
+    print 'Generating nodes for %s' % node.board
     for child in node.generate_children(color):
         val, move = negamax(child, depth - 1, -color, scoring_f)
         best.append((-val, move))

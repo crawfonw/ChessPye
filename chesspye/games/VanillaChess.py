@@ -66,7 +66,6 @@ class VanillaChess(object):
         is_valid = self.rules.move_piece(from_sq, to_sq, self.board)
         if is_valid:
             self.update_position_dict()
-            print self.positions
             is_end = self.end_of_game(-self.active_player().color)
             if is_end:
                 message = 'Game over! %s' % is_end

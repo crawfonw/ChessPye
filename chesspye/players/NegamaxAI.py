@@ -20,12 +20,11 @@ class NegamaxAI(AIPlayer):
         super(NegamaxAI, self).__init__(name, color)
 
     def score_board(self, board):
-        positions = deepcopy(self.game.positions)
         if self.game.rules.is_checkmate(colors.WHITE, board):
             return float('inf')
         elif self.game.rules.is_checkmate(colors.BLACK, board):
             return float('-inf')
-        elif self.game.rules.is_draw(board, positions):
+        elif self.game.rules.is_draw(board, self.game.positions):
             return 0
         else:
             score = 0
@@ -35,8 +34,7 @@ class NegamaxAI(AIPlayer):
         return score
     
     def move(self):
-        return self.minimax_move()
-        #return self.negamax_move()
+        return self.negamax_move()
         
     def minimax_move(self):
         node = BoardTreeNode(self.game.board, self.game.rules, None)
@@ -56,13 +54,11 @@ class NegamaxAI(AIPlayer):
         action_values = {}
         actions = node.generate_children(self.color)
         for i, action in enumerate(actions):
-            av = negamax(action, 1, -self.color, self.score_board)[0]
+            print 'Running negamax for %s: %s' % (action.move, action.board)
+            av = -negamax(action, 1, -self.color, self.score_board)[0]
             action_values[av] = action.move
             print 'Subtree for %s move(s) evaluated.' % (i+1)
-        if self.color == colors.WHITE:
-            return action_values[max(action_values)]
-        else:
-            return action_values[min(action_values)]
+        return action_values[max(action_values)]
                 
     def choose_promotion(self): #TODO: make this smarter (i.e. check for mate with each piece (well, really only the knight)
         return piece_types.QUEEN
