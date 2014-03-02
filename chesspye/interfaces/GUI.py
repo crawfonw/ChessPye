@@ -110,14 +110,14 @@ class GUI(Interface, PygameHelper):
         
         while self.running:
             pygame.display.set_caption("%s: (fps: %i)" % (self.title, self.clock.get_fps()))
-            self.handleEvents()
             self.update()
+            self.handleEvents()
             self.draw()
             pygame.display.flip()
             self.clock.tick(self.fps)
             
             if not self.game.has_winner():
-                response = ''
+                response = 'temp'
                 if self.game.active_player().type == player_types.HUMAN:
                     if self.first_selected_square is not None and self.second_selected_square is not None:
                         print 'Attempting to move for %s...' % self.game.active_player()
@@ -132,7 +132,15 @@ class GUI(Interface, PygameHelper):
                     choice = self.offer_promote(self.game.inactive_player()) #since the move is valid self.game already switched players
                     self.game.handle_pawn_promotion(choice)
                 elif response == 'invalid':
-                    self.display_message('Invalid move!')
+                    alg1 = self.game.board.coordinate_to_algebraic_square(from_sq)
+                    alg2 = self.game.board.coordinate_to_algebraic_square(to_sq)
+                    self.display_message('Invalid move: %s-%s' % (alg1, alg2))
+                elif response == '':
+                    alg1 = self.game.board.coordinate_to_algebraic_square(from_sq)
+                    alg2 = self.game.board.coordinate_to_algebraic_square(to_sq)
+                    self.display_message('Valid move: %s-%s' % (alg1, alg2))
+                elif response != 'temp':
+                    self.display_message(response)
                 if self.first_selected_square is not None and self.second_selected_square is not None:
                     self.first_selected_square = None
                     self.second_selected_square = None
