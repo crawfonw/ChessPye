@@ -9,11 +9,9 @@ from interfaces import CLI, GUI
 from players import HumanPlayer, RandomAI
 
 if __name__ == '__main__':
-    g = VanillaChess(HumanPlayer('White', colors.WHITE), HumanPlayer('Black', colors.BLACK), CLI())
-    #g = VanillaChess(HumanPlayer('White', colors.WHITE), RandomAI('Black', colors.BLACK), CLI())
-    #g.board.pretty_print = False
-    #g.play_game()
-    
-    gui = GUI()
-    gui.setup(g)
-    gui.mainLoop(60)
+    #game = VanillaChess(HumanPlayer('White', colors.WHITE), HumanPlayer('Black', colors.BLACK))
+    game = VanillaChess(HumanPlayer('White', colors.WHITE), RandomAI('Black', colors.BLACK))
+    game.board.pretty_print = False
+    #interface = CLI(game)
+    interface = GUI(game)
+    interface.start()

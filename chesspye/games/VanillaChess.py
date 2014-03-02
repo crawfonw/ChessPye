@@ -5,29 +5,26 @@ Created on Jun 20, 2013
 '''
 
 from boards import ClassicBoard
-from pieces import piece_types, colors
+from pieces import piece_types, colors, vanilla_type_to_obj
 from players import player_types
 from rules import VanillaRules
 
 class VanillaChess(object):
 
-    def __init__(self, white_player, black_player, interface):
+    def __init__(self, white_player, black_player):
         self.name = 'Classic Chess'
         self.board = ClassicBoard()
         self.rules = VanillaRules()
         self.positions = {}
-        self.interface = interface
         self.players = [white_player, black_player]
         self.active_player_id = 0
         
         for player in self.players:
             if player.type == player_types.AI:
                 player.register_game(self) #might be bad
-                
-        self.interface.setup(self)
         
     def __repr__(self):
-        return 'VanillaChess(white_player=%r, black_player=%r)' % (self.white_player, self.black_player)
+        return 'VanillaChess(white_player=%r, black_player=%r)' % (self.players[0], self.players[1])
     
     def active_player(self):
         return self.players[self.active_player_id]
@@ -35,25 +32,14 @@ class VanillaChess(object):
     def next_player(self):
         self.active_player_id = (self.active_player_id + 1) % len(self.players)
     
-    def handle_pawn_promotion(self):
-        last_move = self.board.moves.peek() 
-        if last_move[0].piece_type == piece_types.PAWN:
-            if last_move[0].color == colors.WHITE:
-                if last_move[2][0] == self.board.height - 1:
-                    self.dispatch_promotion_choice(last_move)
-            elif last_move[0].color == colors.BLACK:
-                if last_move[2][0] == 0:
-                    self.dispatch_promotion_choice(last_move)
-    
-    def dispatch_promotion_choice(self, move):
-        new_piece_obj = self.interface.promote(self.active_player())
-        self.board[move[2]] = new_piece_obj
-    
     def update_position_dict(self):
         try:
             self.positions[self.board] += 1
         except KeyError:
             self.positions[self.board] = 1
+    
+    def has_winner(self):
+        return self.end_of_game(self.active_player().color) or self.end_of_game(-self.active_player().color)
     
     def end_of_game(self, color):
         result = self.rules.is_game_over(color, self.board, self.positions)
@@ -61,39 +47,50 @@ class VanillaChess(object):
             return result
         return False
     
-    def end_of_turn_cleanup(self):
-        self.handle_pawn_promotion()
+    def get_move_for_player(self, player):
+        if self.active_player().type == player_types.AI:
+            return self.active_player().move()
+        elif self.active_player().type == player_types.HUMAN:
+            return self.interface.offer_move_to_human(self.active_player())
+        else:
+            raise TypeError()
     
-    def play_game(self):
-        self.interface.draw_board_update(self.board)
-        while True:
-            if self.active_player().type == player_types.AI:
-                move = self.active_player().move()
-            elif self.active_player().type == player_types.HUMAN:
-                move = self.interface.offer_move_to_human(self.active_player())
+    def play_turn(self, move):
+        message = ''
+        from_sq, to_sq = move
+        is_valid = self.rules.move_piece(from_sq, to_sq, self.board)
+        if is_valid:
+            is_end = self.end_of_game(-self.active_player().color)
+            if is_end:
+                message = 'Game over! %s' % is_end
             else:
-                raise TypeError()
-            
-            if isinstance(move, str):
-                from_sq, to_sq = move.split('-')
-            elif isinstance(move, tuple):
-                from_sq, to_sq = move
-            else:
-                from_sq, to_sq = (None, None)
-            is_valid = self.rules.move_piece(from_sq, to_sq, self.board)
-            if is_valid:
-                self.end_of_turn_cleanup()
-                is_end = self.end_of_game(self.active_player().color * -1)
-                if is_end:
-                    break
-                else:
-                    self.next_player()
-            else:
-                self.interface.display_message('Invalid move')
-            self.interface.draw_board_update(self.board)
-            print self.rules.game_variables
-        print 'Game over! %s' % is_end
-        return self.active_player()
+                self.next_player()
+        else:
+            message = 'invalid'
+        if self.has_promotion():
+            message = 'promote'
+        return message
+    
+    def has_promotion(self):
+        last_move = self.board.moves.peek() 
+        if last_move[0].piece_type == piece_types.PAWN:
+            if last_move[0].color == colors.WHITE:
+                if last_move[2][0] == self.board.height - 1:
+                    return True
+            elif last_move[0].color == colors.BLACK:
+                if last_move[2][0] == 0:
+                    return True
+        return False
+    
+    def handle_pawn_promotion(self, choice):
+        last_move = self.board.moves.peek() 
+        if last_move[0].piece_type == piece_types.PAWN:
+            if last_move[0].color == colors.WHITE:
+                if last_move[2][0] == self.board.height - 1:
+                    self.board[last_move[2]] = vanilla_type_to_obj(choice, last_move[0].color)
+            elif last_move[0].color == colors.BLACK:
+                if last_move[2][0] == 0:
+                    self.board[last_move[2]] = vanilla_type_to_obj(choice, last_move[0].color)
 
 ''' This will probably be moved to an AI player since they would only use this...
     def score_board(self):

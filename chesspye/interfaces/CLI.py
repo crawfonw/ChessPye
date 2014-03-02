@@ -9,21 +9,43 @@ from players import player_types
 
 class CLI(Interface):
     
-    def __init__(self):
-        super(CLI, self).__init__()
+    def __init__(self, game_instance):
+        super(CLI, self).__init__(game_instance)
         
-    def setup(self, game_instance):
-        pass
+    def start(self):
+        self.draw_board_update()
+        while not self.game.has_winner():
+            move = self.offer_move(self.game.active_player())
+            response = self.game.play_turn(move)
+            if response == 'promote':
+                choice = self.offer_promote()
+                self.game.handle_pawn_promotion(choice)
+            elif response == 'invalid':
+                self.display_message('Invalid move!')
+            self.draw_board_update()
         
     def display_message(self, message):
         print message
         
-    def draw_board_update(self, board):
-        print str(board)
+    def draw_board_update(self):
+        print str(self.game.board)
         
-    def offer_move_to_human(self, player):
+    def offer_move(self, player):
         if player.type == player_types.HUMAN:
             print '%s to move.' % player.name
-            return raw_input('Enter move ([from]-[to]):\n')
-        else:
-            raise TypeError()
+            move = ''
+            while len(move.split('-')) != 2:
+                move = raw_input('Enter move ([from]-[to]):\n')
+            return move.split('-')
+        elif player.type == player_types.AI:
+            return player.move()
+        
+    def offer_promote(self, player):
+        choice = ''
+        if player.type == player_types.HUMAN:
+            while choice.upper() not in ('B', 'N', 'R', 'Q'):
+                choice = raw_input('Promote to B, N, R, or Q:\n')
+        elif player.type == player_types.AI:
+            choice = player.choose_promotion()
+        return choice
+            

@@ -10,3 +10,6 @@ class Player(object):
         self.name = name
         self.type = type
         self.color = color
+        
+    def __str__(self):
+        return self.name
