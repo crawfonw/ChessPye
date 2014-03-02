@@ -5,6 +5,7 @@ Created on Feb 27, 2014
 '''
 
 from interfaces import Interface
+from pieces import str_to_vanilla_type
 from players import player_types
 
 class CLI(Interface):
@@ -18,7 +19,7 @@ class CLI(Interface):
             move = self.offer_move(self.game.active_player())
             response = self.game.play_turn(move)
             if response == 'promote':
-                choice = self.offer_promote()
+                choice = self.offer_promote(self.game.inactive_player())
                 self.game.handle_pawn_promotion(choice)
             elif response == 'invalid':
                 self.display_message('Invalid move!')
@@ -45,6 +46,7 @@ class CLI(Interface):
         if player.type == player_types.HUMAN:
             while choice.upper() not in ('B', 'N', 'R', 'Q'):
                 choice = raw_input('Promote to B, N, R, or Q:\n')
+            choice = str_to_vanilla_type(choice)
         elif player.type == player_types.AI:
             choice = player.choose_promotion()
         return choice

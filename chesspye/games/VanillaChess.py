@@ -29,6 +29,9 @@ class VanillaChess(object):
     def active_player(self):
         return self.players[self.active_player_id]
     
+    def inactive_player(self):
+        return self.players[(self.active_player_id + 1) % len(self.players)]
+    
     def next_player(self):
         self.active_player_id = (self.active_player_id + 1) % len(self.players)
     
@@ -73,24 +76,27 @@ class VanillaChess(object):
     
     def has_promotion(self):
         last_move = self.board.moves.peek() 
-        if last_move[0].piece_type == piece_types.PAWN:
-            if last_move[0].color == colors.WHITE:
-                if last_move[2][0] == self.board.height - 1:
-                    return True
-            elif last_move[0].color == colors.BLACK:
-                if last_move[2][0] == 0:
-                    return True
-        return False
+        if last_move is not None:
+            if last_move[0].piece_type == piece_types.PAWN:
+                if last_move[0].color == colors.WHITE:
+                    if last_move[2][0] == self.board.height - 1:
+                        return True
+                elif last_move[0].color == colors.BLACK:
+                    if last_move[2][0] == 0:
+                        return True
+            return False
     
     def handle_pawn_promotion(self, choice):
         last_move = self.board.moves.peek() 
         if last_move[0].piece_type == piece_types.PAWN:
             if last_move[0].color == colors.WHITE:
                 if last_move[2][0] == self.board.height - 1:
-                    self.board[last_move[2]] = vanilla_type_to_obj(choice, last_move[0].color)
+                    self.board.pieces[last_move[2]] = vanilla_type_to_obj(choice, last_move[0].color)
+                    self.board.moves.push((self.board.pieces[last_move[2]], last_move[1], last_move[2]))
             elif last_move[0].color == colors.BLACK:
                 if last_move[2][0] == 0:
-                    self.board[last_move[2]] = vanilla_type_to_obj(choice, last_move[0].color)
+                    self.board.pieces[last_move[2]] = vanilla_type_to_obj(choice, last_move[0].color)
+                    self.board.moves.push((self.board.pieces[last_move[2]], last_move[1], last_move[2]))
 
 ''' This will probably be moved to an AI player since they would only use this...
     def score_board(self):

@@ -6,6 +6,7 @@ Created on Jun 20, 2013
 
 import pygame
 
+from pieces import str_to_vanilla_type
 from players import player_types
 from utils import spritesheet
 
@@ -107,7 +108,7 @@ class GUI(Interface, PygameHelper):
         self.running = True
         self.fps = fps
         
-        while self.running and not self.game.has_winner():
+        while self.running:
             pygame.display.set_caption("%s: (fps: %i)" % (self.title, self.clock.get_fps()))
             self.handleEvents()
             self.update()
@@ -115,25 +116,26 @@ class GUI(Interface, PygameHelper):
             pygame.display.flip()
             self.clock.tick(self.fps)
             
-            response = ''
-            if self.game.active_player().type == player_types.HUMAN:
-                if self.first_selected_square is not None and self.second_selected_square is not None:
-                    print 'Attempting to move for %s...' % self.game.active_player()
-                    from_sq = self.region_to_coord[(self.first_selected_square[0], self.first_selected_square[1])]
-                    to_sq = self.region_to_coord[(self.second_selected_square[0], self.second_selected_square[1])]
+            if not self.game.has_winner():
+                response = ''
+                if self.game.active_player().type == player_types.HUMAN:
+                    if self.first_selected_square is not None and self.second_selected_square is not None:
+                        print 'Attempting to move for %s...' % self.game.active_player()
+                        from_sq = self.region_to_coord[(self.first_selected_square[0], self.first_selected_square[1])]
+                        to_sq = self.region_to_coord[(self.second_selected_square[0], self.second_selected_square[1])]
+                        response = self.game.play_turn((from_sq, to_sq))
+                elif self.game.active_player().type == player_types.AI:
+                    from_sq, to_sq = self.game.active_player().move()
                     response = self.game.play_turn((from_sq, to_sq))
-            elif self.game.active_player().type == player_types.AI:
-                from_sq, to_sq = self.game.active_player().move()
-                response = self.game.play_turn((from_sq, to_sq))
-            
-            if response == 'promote':
-                choice = self.offer_promote(self.game.active_player())
-                self.game.handle_pawn_promotion(choice)
-            elif response == 'invalid':
-                self.display_message('Invalid move!')
-            if self.first_selected_square is not None and self.second_selected_square is not None:
-                self.first_selected_square = None
-                self.second_selected_square = None
+                
+                if response == 'promote':
+                    choice = self.offer_promote(self.game.inactive_player()) #since the move is valid self.game already switched players
+                    self.game.handle_pawn_promotion(choice)
+                elif response == 'invalid':
+                    self.display_message('Invalid move!')
+                if self.first_selected_square is not None and self.second_selected_square is not None:
+                    self.first_selected_square = None
+                    self.second_selected_square = None
     
     def update(self):
         self.draw_squares()
@@ -155,5 +157,13 @@ class GUI(Interface, PygameHelper):
                     self.second_selected_square = clicked_squares[0]
                     
     def offer_promote(self, player):
-        raise NotImplementedError()
+        choice = ''
+        if player.type == player_types.HUMAN:
+            while choice.upper() not in ('B', 'N', 'R', 'Q'):
+                print choice
+                choice = raw_input('Promote to B, N, R, or Q:\n')
+            choice = str_to_vanilla_type(choice)
+        elif player.type == player_types.AI:
+            choice = player.choose_promotion()
+        return choice
                 

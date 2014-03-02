@@ -7,8 +7,9 @@ Completely Random AI. Pick a piece that can move and move it.
 That's all.
 '''
 
-from random import shuffle
+from random import choice, shuffle
 
+from pieces import piece_types
 from Enums import player_types
 from AIPlayer import AIPlayer
         
@@ -28,4 +29,7 @@ class RandomAI(AIPlayer):
                 if len(possible_moves) > 0:
                     shuffle(possible_moves)
                     return (from_sq, possible_moves[0])
+                
+    def choose_promotion(self):
+        return choice((piece_types.BISHOP, piece_types.KNIGHT, piece_types.ROOK, piece_types.QUEEN))
         
