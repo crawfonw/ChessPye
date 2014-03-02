@@ -4,6 +4,8 @@ Created on Jun 20, 2013
 @author: nick
 '''
 
+from copy import deepcopy
+
 from boards import ClassicBoard
 from pieces import piece_types, colors, vanilla_type_to_obj
 from players import player_types
@@ -37,9 +39,9 @@ class VanillaChess(object):
     
     def update_position_dict(self):
         try:
-            self.positions[self.board] += 1
+            self.positions[deepcopy(self.board)] += 1
         except KeyError:
-            self.positions[self.board] = 1
+            self.positions[deepcopy(self.board)] = 1
     
     def has_winner(self):
         return self.end_of_game(self.active_player().color) or self.end_of_game(-self.active_player().color)
@@ -63,7 +65,7 @@ class VanillaChess(object):
         from_sq, to_sq = move
         is_valid = self.rules.move_piece(from_sq, to_sq, self.board)
         if is_valid:
-            #self.update_position_dict()
+            self.update_position_dict()
             print self.positions
             is_end = self.end_of_game(-self.active_player().color)
             if is_end:
