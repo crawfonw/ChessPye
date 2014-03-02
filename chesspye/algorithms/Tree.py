@@ -29,8 +29,6 @@ class BoardTreeNode(object):
                 possible_moves = self.rules.generate_all_valid_target_squares_for_vector(from_sq, piece, move_vector, self.board)
                 for move in possible_moves:
                     test_board = deepcopy(self.board)
-                    if self.rules.is_valid_move(from_sq, move, test_board):
-                        self.rules.move_piece(from_sq, move, test_board)
+                    if self.rules.move_piece(from_sq, move, test_board):
                         children.append(BoardTreeNode(test_board, self.rules, (from_sq, move)))
         return children
-            

@@ -10,7 +10,7 @@ to look ahead n moves.
 from copy import deepcopy
 from random import choice
 
-from algorithms import BoardTreeNode, negamax
+from algorithms import BoardTreeNode, negamax, minimax
 from pieces import piece_types, colors
 from AIPlayer import AIPlayer
         
@@ -21,10 +21,8 @@ class NegamaxAI(AIPlayer):
 
     def score_board(self, board):
         if self.game.rules.is_checkmate(colors.WHITE, board):
-            print 'WCh'
             return float('inf')
         elif self.game.rules.is_checkmate(colors.BLACK, board):
-            print 'BCh'
             return float('-inf')
         elif self.game.rules.is_stalemate(colors.WHITE, board) or self.game.rules.is_stalemate(colors.BLACK, board):
             return 0
@@ -37,20 +35,35 @@ class NegamaxAI(AIPlayer):
         
     def move(self):
         node = BoardTreeNode(self.game.board, self.game.rules, None)
-        action_values = []
+        action_values = {}
+        actions = node.generate_children(self.color)
+        for action in actions:
+            print 'Applying minimax to move %s (for color %s): %s' % (action.move, -self.color, action.board)
+            av = minimax(action, 2, -self.color, self.score_board)[0]
+            print av, action.move
+            print
+            action_values[av] = action.move
+            #action_values.append((av, action.move))
+        print action_values
+        if self.color == colors.WHITE:
+            return action_values[max(action_values)]
+        else:
+            return action_values[min(action_values)]
+        
+    def move1(self):
+        node = BoardTreeNode(self.game.board, self.game.rules, None)
+        action_values = {}
         actions = node.generate_children(self.color)
         for action in actions:
             av = self.color * negamax(action, 2, self.color, self.score_board)[0]
             print av, action.move
-            #action_values[av] = action.move
-            action_values.append((av, action.move))
+            action_values[av] = action.move
+            #action_values.append((av, action.move))
         print action_values
-        return action_values[max(action_values)]
-        
-        #best_move = self.color * negamax(node, 2, self.color, self.score_board)
-        #best = negamax(node, 2, self.color, self.score_board)
-        #print 'Best move: %s (score: %s)' % (str(best[1]), -best[0])
-        #return best[1]
+        if self.color == colors.WHITE:
+            return action_values[max(action_values)]
+        else:
+            return action_values[min(action_values)]
                 
     def choose_promotion(self): #TODO: make this smarter (i.e. check for mate with each piece (well, really only the knight)
         return piece_types.QUEEN

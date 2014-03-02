@@ -13,7 +13,7 @@ if __name__ == '__main__':
     #game = VanillaChess(HumanPlayer('White', colors.WHITE), HumanPlayer('Black', colors.BLACK))
     #game = VanillaChess(HumanPlayer('White', colors.WHITE), RandomAI('Black', colors.BLACK))
     game = VanillaChess(HumanPlayer('White', colors.WHITE), NegamaxAI('Black', colors.BLACK))
-    #game = VanillaChess(HumanPlayer('Black', colors.BLACK), NegamaxAI('White', colors.WHITE))
+    #game = VanillaChess(NegamaxAI('White', colors.WHITE), HumanPlayer('Black', colors.BLACK))
     game.board = SmallTestBoard()
     game.board.pretty_print = False
     #interface = CLI(game)
