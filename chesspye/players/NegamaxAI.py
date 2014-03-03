@@ -53,7 +53,7 @@ class NegamaxAI(AIPlayer):
         action_values = {}
         actions = node.generate_children(self.color)
         for i, action in enumerate(actions):
-            av = minimax(action, self.depth, -self.color, self.score_board)[0]
+            av = minimax(action, self.depth, -self.color, self.score_board)
             action_values[av] = action.move
             print 'Subtree for %s move(s) evaluated.' % (i+1)
         if self.color == colors.WHITE:
@@ -67,7 +67,7 @@ class NegamaxAI(AIPlayer):
         actions = node.generate_children(self.color)
         for i, action in enumerate(actions):
             print 'Running negamax for %s: %s' % (action.move, action.board)
-            av = -negamax(action, self.depth, -self.color, self.score_board)[0]
+            av = -negamax(action, self.depth, -self.color, self.score_board)
             action_values[av] = action.move
             print 'Subtree for %s move(s) evaluated.' % (i+1)
         print
@@ -80,7 +80,7 @@ class NegamaxAI(AIPlayer):
         actions = node.generate_children(self.color)
         for i, action in enumerate(actions):
             print 'Running negamax_ab for %s: %s' % (action.move, action.board)
-            av = -negamax_ab(action, self.depth, (float('-inf'), None), (float('inf'), None), -self.color, self.score_board)[0]
+            av = -negamax_ab(action, self.depth, float('-inf'), float('inf'), -self.color, self.score_board)
             action_values[av] = action.move
             print 'Subtree for %s move(s) evaluated.' % (i+1)
         print

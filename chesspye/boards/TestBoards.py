@@ -31,4 +31,24 @@ class SmallTestBoard(Board):
         self.kings[colors.BLACK] = (7,1)
         self.kings[colors.WHITE] = (3,2)
         
+class PawnAndKnightsTestBoard(Board):
+    
+    def __init__(self):
+        super(PawnAndKnightsTestBoard, self).__init__(8,8)
+        
+        self.set_square_to_piece('f2', Pawn(colors.WHITE))
+        self.set_square_to_piece('g2', Pawn(colors.WHITE))
+        self.set_square_to_piece('h2', Pawn(colors.WHITE))
+        self.set_square_to_piece('f3', Knight(colors.WHITE))
+        
+        self.set_square_to_piece('f7', Pawn(colors.BLACK))
+        self.set_square_to_piece('g7', Pawn(colors.BLACK))
+        self.set_square_to_piece('h7', Pawn(colors.BLACK))
+        self.set_square_to_piece('f6', Knight(colors.BLACK))
+        
+        self.pieces[(7,6)] = King(colors.BLACK)
+        self.pieces[(0,6)] = King(colors.WHITE)
+        self.kings[colors.BLACK] = (7,6)
+        self.kings[colors.WHITE] = (0,6)
+        
         

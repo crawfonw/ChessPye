@@ -4,7 +4,7 @@ Created on Jun 21, 2013
 @author: nick
 '''
 from pieces import colors
-from boards import SmallTestBoard
+from boards import SmallTestBoard, PawnAndKnightsTestBoard
 from games import VanillaChess
 from interfaces import CLI, GUI
 from players import HumanPlayer, RandomAI, HalfLookAI, NegamaxAI
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     game = VanillaChess(HumanPlayer('White', colors.WHITE), NegamaxAI('Black', colors.BLACK, False))
     #game = VanillaChess(NegamaxAI('Black', colors.BLACK), HumanPlayer('White', colors.WHITE))
     #game = VanillaChess(NegamaxAI('White', colors.WHITE), HumanPlayer('Black', colors.BLACK))
-    game.board = SmallTestBoard()
+    game.board = PawnAndKnightsTestBoard()
     game.board.pretty_print = False
     #interface = CLI(game)
     interface = GUI(game)
