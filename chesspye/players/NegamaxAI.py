@@ -11,7 +11,7 @@ from copy import deepcopy
 from random import choice
 import time
 
-from algorithms import BoardTreeNode, negamax, minimax, negamax_parallel
+from algorithms import BoardTreeNode, negamax, minimax, negamax_ab
 from pieces import piece_types, colors
 from AIPlayer import AIPlayer
         
@@ -42,7 +42,8 @@ class NegamaxAI(AIPlayer):
             print 'Parallel'
             move = self.negamax_move_parallel()
         else:
-            move = self.negamax_move()
+            #move = self.negamax_move()
+            move = self.negamax_ab_move()
         t2 = time.time()
         print 'Runtime: %0.3f sec' % float((t2 - t1))
         return move 
@@ -61,12 +62,25 @@ class NegamaxAI(AIPlayer):
             return action_values[min(action_values)]
         
     def negamax_move(self):
-        node = BoardTreeNode(self.game.board, self.game.rules, None)
+        node = BoardTreeNode(self.game.board, self.game.rules, self.game.positions, None)
         action_values = {}
         actions = node.generate_children(self.color)
         for i, action in enumerate(actions):
             print 'Running negamax for %s: %s' % (action.move, action.board)
             av = -negamax(action, self.depth, -self.color, self.score_board)[0]
+            action_values[av] = action.move
+            print 'Subtree for %s move(s) evaluated.' % (i+1)
+        print
+        print 'Values: %s' % action_values
+        return action_values[max(action_values)]
+    
+    def negamax_ab_move(self):
+        node = BoardTreeNode(self.game.board, self.game.rules, self.game.positions, None)
+        action_values = {}
+        actions = node.generate_children(self.color)
+        for i, action in enumerate(actions):
+            print 'Running negamax_ab for %s: %s' % (action.move, action.board)
+            av = -negamax_ab(action, self.depth, (float('-inf'), None), (float('inf'), None), -self.color, self.score_board)[0]
             action_values[av] = action.move
             print 'Subtree for %s move(s) evaluated.' % (i+1)
         print

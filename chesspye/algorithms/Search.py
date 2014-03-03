@@ -27,18 +27,31 @@ def minimax(node, depth, color, scoring_f):
 
 def negamax(node, depth, color, scoring_f):
     print 'Evaluating %s at depth %s' % (node.move, depth)
-    if depth == 0:
-        #print 'Evaluating %s for board %s' % (node.move, node.board)
-        score = scoring_f(node.board) * color
-        print 'Score (color=%s): %s' % (color, score)
-        return scoring_f(node.board) * color, node.move
+    if depth == 0 or node.is_terminal():
+        score = scoring_f(node.board)
+        print '%s score = %s' % (node.move, score)
+        return score * color, node.move
     best = [(float('-inf'), None)]
-    print 'Generating nodes for %s' % node.board
     for child in node.generate_children(color):
         val, move = negamax(child, depth - 1, -color, scoring_f)
         best.append((-val, move))
-    print 'Best for this subtree: %s' % str(best)
     return max(best)
+
+def negamax_ab(node, depth, alpha, beta, color, scoring_f):
+    print 'Evaluating %s at depth %s' % (node.move, depth)
+    if depth == 0 or node.is_terminal():
+        score = scoring_f(node.board)
+        print '%s score = %s' % (node.move, score)
+        return score * color, node.move
+    best = (float('-inf'), None)
+    for child in node.generate_children(color):
+        val, move = negamax_ab(child, depth - 1, (-beta[0], beta[1]), (-alpha[0], alpha[1]), -color, scoring_f)
+        score = (-val, move)
+        best = max(best, score)
+        alpha = max(alpha, score)
+        if alpha >= beta:
+            break
+    return best
 
 def negamax_parallel(node, depth, color, scoring_f):
     from multiprocessing import Pool

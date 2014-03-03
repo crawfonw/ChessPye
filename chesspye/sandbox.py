@@ -38,12 +38,11 @@ def _unpickle_method(func_name, obj, cls):
             break
     return func.__get__(obj, cls)
 
-
 if __name__ == '__main__':
     copy_reg.pickle(types.MethodType, _pickle_method1, _unpickle_method)
     #game = VanillaChess(HumanPlayer('White', colors.WHITE), HumanPlayer('Black', colors.BLACK))
     #game = VanillaChess(RandomAI('White', colors.WHITE), NegamaxAI('Black', colors.BLACK))
-    game = VanillaChess(HumanPlayer('White', colors.WHITE), NegamaxAI('Black', colors.BLACK, True))
+    game = VanillaChess(HumanPlayer('White', colors.WHITE), NegamaxAI('Black', colors.BLACK, False))
     #game = VanillaChess(NegamaxAI('Black', colors.BLACK), HumanPlayer('White', colors.WHITE))
     #game = VanillaChess(NegamaxAI('White', colors.WHITE), HumanPlayer('Black', colors.BLACK))
     game.board = SmallTestBoard()
