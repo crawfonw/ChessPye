@@ -9,9 +9,10 @@ from Player import Player
         
 class AIPlayer(Player):
     
-    def __init__(self, name, color):
+    def __init__(self, name, color, parallel=False):
         super(AIPlayer, self).__init__(name, player_types.AI, color)
         self.game = None
+        self.parallel = parallel
         
     def register_game(self, game):
         self.game = game

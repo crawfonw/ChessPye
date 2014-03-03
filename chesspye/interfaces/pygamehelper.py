@@ -22,7 +22,7 @@ def drawGraph(screen, arr, step=5):
             p2 = ((i+1)*step, maxy-arr[i+1])
             pygame.draw.line(screen, (0,0,0), p1, p2)
         
-class PygameHelper:
+class PygameHelper(object):
     def __init__(self, size=(512,512), fill=(255,255,255), title='PyGame'):
         pygame.init()
         self.screen = pygame.display.set_mode(size)

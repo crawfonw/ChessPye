@@ -26,8 +26,9 @@ def minimax(node, depth, color, scoring_f):
         return best
 
 def negamax(node, depth, color, scoring_f):
+    print 'Evaluating %s at depth %s' % (node.move, depth)
     if depth == 0:
-        print 'Evaluating %s for board %s' % (node.move, node.board)
+        #print 'Evaluating %s for board %s' % (node.move, node.board)
         score = scoring_f(node.board) * color
         print 'Score (color=%s): %s' % (color, score)
         return scoring_f(node.board) * color, node.move
@@ -35,6 +36,26 @@ def negamax(node, depth, color, scoring_f):
     print 'Generating nodes for %s' % node.board
     for child in node.generate_children(color):
         val, move = negamax(child, depth - 1, -color, scoring_f)
+        best.append((-val, move))
+    print 'Best for this subtree: %s' % str(best)
+    return max(best)
+
+def negamax_parallel(node, depth, color, scoring_f):
+    from multiprocessing import Pool
+    pool = Pool(processes=4)
+    
+    print 'Evaluating %s at depth %s' % (node.move, depth)
+    if depth == 0:
+        #print 'Evaluating %s for board %s' % (node.move, node.board)
+        score = scoring_f(node.board) * color
+        print 'Score (color=%s): %s' % (color, score)
+        return scoring_f(node.board) * color, node.move
+    best = [(float('-inf'), None)]
+    print 'Generating nodes for %s' % node.board
+    for child in node.generate_children(color):
+        result = pool.apply_async(negamax, [child, depth - 1, -color, scoring_f])
+        #val, move = negamax(child, depth - 1, -color, scoring_f)
+        val, move =  result.get(timeout=1)
         best.append((-val, move))
     print 'Best for this subtree: %s' % str(best)
     return max(best)
