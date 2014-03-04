@@ -6,6 +6,10 @@ Created on Mar 1, 2014
 Uses the negamax algorithm (http://en.wikipedia.org/wiki/Negamax)
 to look ahead n moves.
 '''
+import copy_reg
+import types
+
+import pp, sys
 
 from copy import deepcopy
 from random import choice
@@ -14,12 +18,37 @@ import time
 from algorithms import BoardTreeNode, negamax, minimax, negamax_ab
 from pieces import piece_types, colors
 from AIPlayer import AIPlayer
-        
+
+def _pickle_method1(method):
+    func_name = method.im_func.__name__
+    obj = method.im_self
+    cls = method.im_class
+    return _unpickle_method, (func_name, obj, cls)
+
+def _pickle_method(method):
+    func_name = method.im_func.__name__
+    obj = method.im_self
+    cls = method.im_class
+    if func_name.startswith('__') and not func_name.endswith('__'):
+        cls_name = cls.__name__.lstrip('_')
+        if cls_name:
+            func_name = '_' + cls_name + func_name
+    return _unpickle_method, (func_name, obj, cls)
+
+def _unpickle_method(func_name, obj, cls):
+    for cls in cls.mro():
+        try:
+            func = cls.__dict__[func_name]
+        except KeyError:
+            pass
+        else:
+            break
+    return func.__get__(obj, cls)
+
 class NegamaxAI(AIPlayer):
     
     def __init__(self, name, color, parallel=False):
         super(NegamaxAI, self).__init__(name, color, parallel)
-        #self.depth = 1 #default
         self.depth = 2
 
     def score_board(self, board):
@@ -39,13 +68,12 @@ class NegamaxAI(AIPlayer):
     def move(self):
         t1 = time.time()
         if self.parallel:
-            print 'Parallel'
             move = self.negamax_move_parallel()
         else:
             #move = self.negamax_move()
             move = self.negamax_ab_move()
         t2 = time.time()
-        print 'Runtime: %0.3f sec' % float((t2 - t1))
+        print 'Move computed in: %0.3f sec' % float((t2 - t1))
         return move 
         
     def minimax_move(self):
@@ -88,24 +116,27 @@ class NegamaxAI(AIPlayer):
         return action_values[max(action_values)]
     
     def negamax_move_parallel(self):
-        from multiprocessing import Pool
         
-        pool = Pool(processes=4)
+        copy_reg.pickle(types.MethodType, _pickle_method, _unpickle_method)
         
-        node = BoardTreeNode(self.game.board, self.game.rules, None)
+        node = BoardTreeNode(self.game.board, self.game.rules, self.game.positions, None)
         action_values = {}
         actions = node.generate_children(self.color)
         
-        #results = pool.map(f, actions)
-        #f = lambda x: -negamax(x, self.depth, -self.color, self.score_board)[0]
+        ppservers = ()
+        job_server = pp.Server(ppservers=ppservers)
+
+        print "Starting pp with", job_server.get_ncpus(), "workers"
+
+        funcs = (node.generate_children, node.is_terminal, )
+        modules = ()
         
-        for i, action in enumerate(actions):
-            print 'Running negamax for %s: %s' % (action.move, action.board)
-            result = pool.apply(negamax, [action, self.depth, -self.color, self.score_board])
-            action_values[-result[0]] = action.move
-            #pool.close()
-            print 'Subtree for %s move(s) evaluated.' % (i+1)
-        print
+        jobs = [(action, job_server.submit(negamax_ab, (action, self.depth, float('-inf'), float('inf'), -self.color, self.score_board,), funcs, modules)) for action in actions]
+        for action, job in jobs:            
+            action_values[-job()] = action.move
+
+        job_server.print_stats()
+        
         print 'Values: %s' % action_values
         return action_values[max(action_values)]
                 
