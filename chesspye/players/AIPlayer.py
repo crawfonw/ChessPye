@@ -13,6 +13,9 @@ class AIPlayer(Player):
         super(AIPlayer, self).__init__(name, player_types.AI, color)
         self.game = None
         self.parallel = parallel
+        self.depth = 0
+        self.scoring_f = None
+        self.last_nodes_expanded = 0
         
     def register_game(self, game):
         self.game = game

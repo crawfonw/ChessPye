@@ -1,0 +1,8 @@
+Game at 2014-03-05 11:30:28.320000
+White player: White (type=1)
+	AI type: <class 'players.NegamaxAI.NegamaxAI'>
+	Scoring function: algorithms.Scoring.material_score
+	Search Depth: 2
+	Parallel = False
+Black player: Black (type=0)
+

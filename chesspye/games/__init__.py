@@ -5,3 +5,4 @@ Created on Feb 27, 2014
 '''
 
 from VanillaChess import VanillaChess
+from VanillaStatisticsGatherer import VanillaStatisticsGatherer

@@ -6,8 +6,10 @@ Created on Mar 1, 2014
 Uses the negamax algorithm (http://en.wikipedia.org/wiki/Negamax)
 to look ahead n moves.
 '''
+
 import copy_reg
 import types
+from utils import _pickle_method, _unpickle_method
 
 import pp, sys
 
@@ -15,65 +17,23 @@ from copy import deepcopy
 from random import choice
 import time
 
-from algorithms import BoardTreeNode, negamax, minimax, negamax_ab, negamax_parallel
+from algorithms import BoardTreeNode, negamax, minimax, negamax_ab, negamax_parallel, negascout
 from pieces import piece_types, colors
 from AIPlayer import AIPlayer
-
-def _pickle_method1(method):
-    func_name = method.im_func.__name__
-    obj = method.im_self
-    cls = method.im_class
-    return _unpickle_method, (func_name, obj, cls)
-
-def _pickle_method(method):
-    func_name = method.im_func.__name__
-    obj = method.im_self
-    cls = method.im_class
-    if func_name.startswith('__') and not func_name.endswith('__'):
-        cls_name = cls.__name__.lstrip('_')
-        if cls_name:
-            func_name = '_' + cls_name + func_name
-    return _unpickle_method, (func_name, obj, cls)
-
-def _unpickle_method(func_name, obj, cls):
-    for cls in cls.mro():
-        try:
-            func = cls.__dict__[func_name]
-        except KeyError:
-            pass
-        else:
-            break
-    return func.__get__(obj, cls)
+from algorithms import material_score
 
 class NegamaxAI(AIPlayer):
     
     def __init__(self, name, color, parallel=False):
         super(NegamaxAI, self).__init__(name, color, parallel)
         self.depth = 2
-
-    def score_board(self, board):
-        if self.game.rules.is_checkmate(colors.WHITE, board):
-            return float('inf')
-        elif self.game.rules.is_checkmate(colors.BLACK, board):
-            return float('-inf')
-        elif self.game.rules.is_draw(board, self.game.positions):
-            return 0
-        else:
-            score = 0
-            for piece in board.pieces.itervalues():
-                if piece is not None:
-                    score += piece.color * piece.value
-        return score
+        self.scoring_f = material_score
     
     def move(self):
-        t1 = time.time()
         if self.parallel:
             move = self.negamax_move_parallel()
         else:
-            #move = self.negamax_move()
             move = self.negamax_ab_move()
-        t2 = time.time()
-        print 'Move computed in: %0.3f sec' % float((t2 - t1))
         return move 
         
     def minimax_move(self):
