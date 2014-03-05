@@ -15,7 +15,7 @@ from copy import deepcopy
 from random import choice
 import time
 
-from algorithms import BoardTreeNode, negamax, minimax, negamax_ab
+from algorithms import BoardTreeNode, negamax, minimax, negamax_ab, negamax_parallel
 from pieces import piece_types, colors
 from AIPlayer import AIPlayer
 
@@ -131,7 +131,7 @@ class NegamaxAI(AIPlayer):
         funcs = (node.generate_children, node.is_terminal, )
         modules = ()
         
-        jobs = [(action, job_server.submit(negamax_ab, (action, self.depth, float('-inf'), float('inf'), -self.color, self.score_board,), funcs, modules)) for action in actions]
+        jobs = [(action, job_server.submit(negamax_parallel, (action, self.depth, float('-inf'), float('inf'), -self.color, self.score_board,), funcs, modules)) for action in actions]
         for action, job in jobs:            
             action_values[-job()] = action.move
 

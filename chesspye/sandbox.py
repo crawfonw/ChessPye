@@ -18,6 +18,6 @@ if __name__ == '__main__':
     game = VanillaChess(white, black)
     game.board = SmallTestBoard()
     game.board.pretty_print = False
-    interface = CLI(game)
-    #interface = GUI(game)
+    #interface = CLI(game)
+    interface = GUI(game)
     interface.start()
