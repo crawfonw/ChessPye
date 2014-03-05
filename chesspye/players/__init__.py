@@ -9,4 +9,6 @@ from Player import Player
 from HumanPlayer import HumanPlayer
 from RandomAI import RandomAI
 from HalfLookAI import HalfLookAI
+from MinimaxAI import MinimaxAI
 from NegamaxAI import NegamaxAI
+from NegamaxAlphaBetaAI import NegamaxAlphaBetaAI

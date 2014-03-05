@@ -61,6 +61,10 @@ class Board(object):
         alg += '%s%s' % (ctl(to_sq[0][1]), to_sq[0][0] + 1)
         return alg
     
+    def coordinate_to_long_algebraic(self, from_sq, to_sq):
+        return '%s-%s' % (self.coordinate_to_algebraic_square(from_sq), \
+                          self.coordinate_to_algebraic_square(to_sq))
+    
     def coordinate_to_algebraic_square(self, square):
         return '%s%s' % (ctl(square[1]), square[0]+1)
     

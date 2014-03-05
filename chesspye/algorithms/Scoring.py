@@ -6,7 +6,7 @@ Created on Mar 5, 2014
 
 from pieces import colors
 
-def material_score(self, board, game):
+def material_score(board, game):
     if game.rules.is_checkmate(colors.WHITE, board):
         return float('inf')
     elif game.rules.is_checkmate(colors.BLACK, board):

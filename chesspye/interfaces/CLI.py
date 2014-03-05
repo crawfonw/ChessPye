@@ -39,7 +39,7 @@ class CLI(Interface):
                 move = raw_input('Enter move ([from]-[to]):\n')
             return move.split('-')
         elif player.type == player_types.AI:
-            return player.move()
+            return self.game.get_move_for_ai(player)
         
     def offer_promote(self, player):
         choice = ''

@@ -125,7 +125,7 @@ class GUI(Interface, PygameHelper):
                         to_sq = self.region_to_coord[(self.second_selected_square[0], self.second_selected_square[1])]
                         response = self.game.play_turn((from_sq, to_sq))
                 elif self.game.active_player().type == player_types.AI:
-                    from_sq, to_sq = self.game.active_player().move()
+                    from_sq, to_sq = self.game.get_move_for_ai(self.game.active_player())
                     response = self.game.play_turn((from_sq, to_sq))
                 
                 if response == 'promote':
