@@ -22,7 +22,6 @@ class NegamaxAlphaBetaAI(AIPlayer):
     
     def __init__(self, name, color, parallel=False):
         super(NegamaxAlphaBetaAI, self).__init__(name, color, parallel)
-        self.depth = 2
         self.scoring_f = material_score
     
     def move(self):

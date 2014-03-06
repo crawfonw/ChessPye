@@ -12,3 +12,4 @@ from HalfLookAI import HalfLookAI
 from MinimaxAI import MinimaxAI
 from NegamaxAI import NegamaxAI
 from NegamaxAlphaBetaAI import NegamaxAlphaBetaAI
+from NegascoutAI import NegascoutAI

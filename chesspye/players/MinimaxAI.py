@@ -16,7 +16,6 @@ class MinimaxAI(AIPlayer):
     
     def __init__(self, name, color, parallel=False):
         super(MinimaxAI, self).__init__(name, color, parallel)
-        self.depth = 2
         self.scoring_f = material_score
     
     def move(self):
@@ -38,7 +37,7 @@ class MinimaxAI(AIPlayer):
         
     def minimax(self, node, depth, color):
         if depth == 0:
-            self.last_nodes_expanded += 0
+            self.last_nodes_expanded += 1
             return self.scoring_f(node.board, self.game)
         children = node.generate_children(color)
         if color == colors.WHITE:

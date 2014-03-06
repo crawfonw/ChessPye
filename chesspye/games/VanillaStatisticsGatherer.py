@@ -70,7 +70,7 @@ class VanillaStatisticsGatherer(VanillaChess):
     def end_of_game(self, color):
         result = self.rules.is_game_over(color, self.board, self.positions)
         if result:
-            for player in players:
+            for player in self.players:
                 if player.type == player_types.AI:
                     f = open(self.stat_file, 'a')
                     f.writelines('Player %s stats:\n' % player)

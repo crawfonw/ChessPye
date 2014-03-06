@@ -16,7 +16,6 @@ class NegamaxAI(AIPlayer):
     
     def __init__(self, name, color, parallel=False):
         super(NegamaxAI, self).__init__(name, color, parallel)
-        self.depth = 2
         self.scoring_f = material_score
     
     def move(self):
@@ -29,7 +28,7 @@ class NegamaxAI(AIPlayer):
         actions = node.generate_children(self.color)
         for i, action in enumerate(actions):
             print 'Running negamax for %s: %s' % (action.move, action.board)
-            av = -self.negamax(action, self.depth, -self.color, self.scoring_f)
+            av = -self.negamax(action, self.depth, -self.color)
             action_values[av] = action.move
             print 'Subtree for %s move(s) evaluated.' % (i+1)
         print
@@ -40,7 +39,7 @@ class NegamaxAI(AIPlayer):
         #print 'Evaluating %s at depth %s' % (node.move, depth)
         if depth == 0 or node.is_terminal():
             score = self.scoring_f(node.board, self.game)
-            self.last_nodes_expanded += 0
+            self.last_nodes_expanded += 1
             #print '%s score = %s' % (node.move, score)
             return score * color
         best = float('-inf')
