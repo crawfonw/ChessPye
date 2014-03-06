@@ -56,27 +56,24 @@ class NegamaxAlphaBetaAI(AIPlayer):
         ppservers = ()
         job_server = pp.Server(ppservers=ppservers)
 
-        print "Starting pp with", job_server.get_ncpus(), "workers"
+        #print "Starting pp with", job_server.get_ncpus(), "workers"
 
         funcs = (node.generate_children, node.is_terminal, )
         modules = ()
         
-        jobs = [(action, job_server.submit(negamax_parallel, (action, self.depth, float('-inf'), float('inf'), -self.color, self.scoring_f,), funcs, modules)) for action in actions]
+        jobs = [(action, job_server.submit(self.negamax_parallel, (action, self.depth, float('-inf'), float('inf'), -self.color,), funcs, modules)) for action in actions]
         for action, job in jobs:            
             action_values[-job()] = action.move
 
-        job_server.print_stats()
+        #job_server.print_stats()
         
-        print 'Values: %s' % action_values
+        #print 'Values: %s' % action_values
         return action_values[max(action_values)]
     
     def negamax_ab(self, node, depth, alpha, beta, color):
-        #print 'Evaluating %s at depth %s' % (node.move, depth)
         if depth == 0 or node.is_terminal():
-            score = self.scoring_f(node.board, self.game)
-            #print '%s score = %s' % (node.move, score)
             self.last_nodes_expanded += 1
-            return score * color
+            return self.scoring_f(node.board, self.game) * color
         best = float('-inf')
         for child in node.generate_children(color):
             val = -self.negamax_ab(child, depth - 1, -beta, -alpha, -color)
@@ -85,7 +82,20 @@ class NegamaxAlphaBetaAI(AIPlayer):
             if alpha >= beta:
                 break
         return best
-                
+
+    def negamax_parallel(self, node, depth, alpha, beta, color):
+        if depth == 0 or node.is_terminal():
+            self.last_nodes_expanded += 1
+            return self.scoring_f(node.board, self.game) * color
+        best = float('-inf')
+        for child in node.generate_children(color):
+            val = -self.negamax_parallel(child, depth - 1, -beta, -alpha, -color)
+            best = max(best, val)
+            alpha = max(alpha, val)
+            if alpha >= beta:
+                break
+        return best
+
     def choose_promotion(self): #TODO: make this smarter (i.e. check for mate with each piece (well, really only the knight)
         return piece_types.QUEEN
         
