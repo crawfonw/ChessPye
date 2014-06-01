@@ -34,7 +34,7 @@ class VanillaChess(object):
     def inactive_player(self):
         return self.players[(self.active_player_id + 1) % len(self.players)]
     
-    def next_player(self):
+    def set_next_player_id(self):
         self.active_player_id = (self.active_player_id + 1) % len(self.players)
     
     def update_position_dict(self):
@@ -72,7 +72,7 @@ class VanillaChess(object):
             if is_end:
                 message = 'Game over! %s' % is_end
             else:
-                self.next_player()
+                self.set_next_player_id()
         else:
             message = 'invalid'
         return message
