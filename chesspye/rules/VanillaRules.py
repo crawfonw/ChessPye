@@ -76,13 +76,12 @@ class VanillaRules(Rules):
     
     #Endgame checks, called from game object
     def is_game_over(self, color, board, positions): #color: is this color check/stalemated?
+        if self.is_checkmate(color, board):
+            return '%s is checkmated' % color
         is_draw = self.is_draw(board, positions)
         if is_draw:
             return is_draw
-        elif self.is_checkmate(color, board):
-            return '%s is checkmate' % color
-        else:
-            return ''
+        return ''
         
     def is_draw(self, board, positions):
         if self.is_fifty_move():

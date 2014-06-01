@@ -65,13 +65,13 @@ class VanillaChess(object):
         from_sq, to_sq = move
         is_valid = self.rules.move_piece(from_sq, to_sq, self.board)
         if is_valid:
+            if self.has_promotion():
+                message = 'promote'
             self.update_position_dict()
             is_end = self.end_of_game(-self.active_player().color)
             if is_end:
                 message = 'Game over! %s' % is_end
             else:
-                if self.has_promotion():
-                    message = 'promote'
                 self.next_player()
         else:
             message = 'invalid'
